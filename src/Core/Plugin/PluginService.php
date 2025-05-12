@@ -4,12 +4,16 @@ namespace LEXO\Captcha\Core\Plugin;
 
 use LEXO\Captcha\Core;
 use LEXO\Captcha\Core\Traits\Helpers;
-use LEXO\Captcha\Core\Loader\Loader;
 use LEXO\Captcha\Core\Updater\PluginUpdater;
 
-class PluginService
+final class PluginService
 {
     use Helpers;
+
+    private function __construct()
+    {
+        //
+    }
 
     public static string $namespace = 'custom-plugin-namespace';
 

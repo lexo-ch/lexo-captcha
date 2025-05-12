@@ -1,5 +1,3 @@
-console.log('front');
-
 class LEXO_Captcha {
     #interacted = null;
 
@@ -32,7 +30,7 @@ class LEXO_Captcha {
         Data.append('action', 'lexo_captcha_request_token');
 
         this.#tokenReady = new Promise(async resolve => {
-            const Response = await fetch(LEXO_CAPTCHA_AJAX_URL, {
+            const Response = await fetch(lexocaptcha_globals.ajax_url, {
                 method: 'POST',
                 body: Data,
             });
@@ -190,7 +188,7 @@ class LEXO_Captcha {
                     await this.compileData(),
                 );
 
-                const Response = await fetch(LEXO_CAPTCHA_AJAX_URL, {
+                const Response = await fetch(lexocaptcha_globals.ajax_url, {
                     method: 'POST',
                     body: Data,
                 });
@@ -266,7 +264,7 @@ class LEXO_Captcha {
                     await this.compileData(),
                 );
 
-                const Response = await fetch(LEXO_CAPTCHA_AJAX_URL, {
+                const Response = await fetch(lexocaptcha_globals.ajax_url, {
                     method: 'POST',
                     body: Data,
                 });

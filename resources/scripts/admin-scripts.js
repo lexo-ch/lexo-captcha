@@ -1,5 +1,3 @@
-console.log('admin');
-
 document.addEventListener('DOMContentLoaded', () => {
 
 });

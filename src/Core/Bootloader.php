@@ -8,6 +8,11 @@ use LEXO\Captcha\Core\Plugin\PluginService;
 
 final class Bootloader
 {
+    private function __construct()
+    {
+        //
+    }
+
     public static function run()
     {
         add_action(

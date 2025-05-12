@@ -7,16 +7,21 @@ use LEXO\Captcha\Core\Plugin\PluginService;
 
 final class Loader
 {
+    private function __construct()
+    {
+        //
+    }
+
     public static function run()
     {
         add_action(
-            'wp_enqueue_scripts',
-            [Loader::class, 'load_front_resources'],
+            'admin_enqueue_scripts',
+            [Loader::class, 'load_admin_resources'],
         );
 
         add_action(
-            'admin_enqueue_scripts',
-            [Loader::class, 'load_admin_resources'],
+            'wp_enqueue_scripts',
+            [Loader::class, 'load_front_resources'],
         );
     }
 
@@ -60,6 +65,14 @@ final class Loader
                 md5_file(self::resource('front.js')),
                 [
                     'strategy'  => 'defer',
+                ],
+            );
+
+            wp_localize_script(
+                PluginService::$namespace . "-front-script",
+                PluginService::$namespace . "_globals",
+                [
+                    'ajax_url' => admin_url('admin-ajax.php'),
                 ],
             );
         }
