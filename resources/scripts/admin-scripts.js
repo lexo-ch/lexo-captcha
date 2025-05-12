@@ -1,6 +1,4 @@
-/**
- * Admin .js file
- */
+console.log('admin');
 
 document.addEventListener('DOMContentLoaded', () => {
 

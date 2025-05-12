@@ -31,10 +31,6 @@ class PluginService
 
     public static function registerNamespace()
     {
-        $config = require_once trailingslashit(Core::$assets) . 'config/config.php';
-
-        Loader::registerNamespace(PluginService::$namespace, $config);
-
         if (is_user_logged_in()) {
             PluginService::$can_manage_plugin = current_user_can(PluginService::getManagePluginCap());
         }

@@ -1,3 +1,5 @@
+console.log('front');
+
 class LEXO_Captcha {
     #interacted = null;
 

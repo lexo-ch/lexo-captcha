@@ -40,8 +40,6 @@ final class Core {
 
     public static string $path;
 
-    public static string $assets;
-
     public static string $url;
 
     public static string $version;
@@ -79,8 +77,6 @@ Core::$plugin_slug = $file_data['Update URI'];
 Core::$basename = plugin_basename(__FILE__);
 
 Core::$path = plugin_dir_path(__FILE__);
-
-Core::$assets = trailingslashit(Core::$path) . 'assets';
 
 Core::$url = plugin_dir_url(__FILE__);
 

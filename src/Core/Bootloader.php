@@ -3,6 +3,7 @@
 namespace LEXO\Captcha\Core;
 
 use LEXO\Captcha\Core;
+use LEXO\Captcha\Core\Loader\Loader;
 use LEXO\Captcha\Core\Plugin\PluginService;
 
 final class Bootloader
@@ -41,12 +42,14 @@ final class Bootloader
             'admin_notices',
             [Bootloader::class, 'onAdminNotices'],
         );
+
+        Loader::run();
     }
 
     public static function onAdminInit()
     {
         PluginService::updateMissingSettings();
-        
+
         PluginService::handleSaveSettings();
     }
 
