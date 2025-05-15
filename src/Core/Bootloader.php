@@ -17,7 +17,7 @@ final class Bootloader
     {
         add_action(
             'init',
-            [Bootloader::class, 'onInit'],
+            [Bootloader::class, 'init'],
             10,
         );
 
@@ -42,8 +42,6 @@ final class Bootloader
             'admin_notices',
             [Bootloader::class, 'onAdminNotices'],
         );
-
-        Loader::add_actions();
     }
 
     public static function onAdminInit()
@@ -51,9 +49,11 @@ final class Bootloader
         //
     }
 
-    public static function onInit()
+    public static function init()
     {
         do_action(Core::$domain . '/init');
+
+        Loader::add_actions();
 
         PluginService::registerNamespace();
     }

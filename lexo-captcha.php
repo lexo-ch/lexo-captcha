@@ -59,6 +59,8 @@ final class Core {
     public static string $update_path;
 
     public static string $original_name_addition;
+
+    const BASE_CAPABILITY = 'administrator';
 }
 
 $file_data = get_file_data(__FILE__, [
@@ -89,8 +91,6 @@ Core::$min_wp_version = $file_data['Requires at least'];
 Core::$domain = $file_data['Text Domain'];
 
 Core::$locales = 'languages';
-
-Core::$field_name = 'lexo_captcha_setting';
 
 Core::$cache_key = Core::$domain . '_cache_key_update';
 

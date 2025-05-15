@@ -3,34 +3,23 @@
 namespace LEXO\Captcha\Core\Plugin;
 
 use LEXO\Captcha\Core;
-use LEXO\Captcha\Core\Traits\Helpers;
 use LEXO\Captcha\Core\Updater\PluginUpdater;
 
 final class PluginService
 {
-    use Helpers;
-
     private function __construct()
     {
         //
     }
 
-    public static string $namespace = 'custom-plugin-namespace';
-
     public static string $check_update;
-
-    public static string $manage_plugin_capability = 'administrator';
-
-    public static string $statistics_parent_slug = 'options-general.php';
-
-    public static string $statistics_page_slug;
 
     public static bool $can_manage_plugin = false;
 
     public static function registerNamespace()
     {
         if (is_user_logged_in()) {
-            PluginService::$can_manage_plugin = current_user_can(PluginService::getManagePluginCap());
+            PluginService::$can_manage_plugin = current_user_can(Core::BASE_CAPABILITY);
         }
 
         add_action(
@@ -45,31 +34,7 @@ final class PluginService
     }
 
     public static function filter($name) {
-        return trailingslashit(PluginService::$namespace) . $name;
-    }
-
-    public static function getManagePluginCap()
-    {
-        $capability = PluginService::$manage_plugin_capability;
-
-        $capability = apply_filters(
-            PluginService::filter('options-page/capability'),
-            $capability,
-        );
-
-        return $capability;
-    }
-
-    public static function get_statistics_page_parent_slug()
-    {
-        $slug = PluginService::$statistics_parent_slug;
-
-        $slug = apply_filters(
-            PluginService::filter('options-page/parent-slug'),
-            $slug,
-        );
-
-        return $slug;
+        return trailingslashit(Core::$domain) . $name;
     }
 
     public static function addAdminLocalizedScripts()
@@ -88,31 +53,18 @@ final class PluginService
             $vars,
         );
 
-        wp_localize_script(trailingslashit(PluginService::$namespace) . 'admin-' . Core::$domain . '.js', Core::$domain . 'AdminLocalized', $vars);
-    }
-
-    public static function get_statistics_link()
-    {
-        $path = PluginService::get_statistics_page_parent_slug();
-
-        if (strpos($path, '.php') === false) {
-            $path = 'admin.php';
-        }
-
-        return esc_url(
-            add_query_arg(
-                'page',
-                PluginService::$statistics_page_slug,
-                admin_url($path)
-            )
+        wp_localize_script(
+            trailingslashit(Core::$domain) . 'admin-' . Core::$domain . '.js',
+            Core::$domain . 'AdminLocalized',
+            $vars,
         );
     }
 
     public static function add_statistics_link($links)
     {
-        $url = PluginService::get_statistics_link();
+        $url = StatisticsPage::link();
 
-        $settings_link = "<a href='{$url}'>" . __('Statistics', 'lexocaptcha') . '</a>';
+        $settings_link = "<a href='{$url}'>" . PluginService::__('Statistics') . '</a>';
 
         array_push(
             $links,
@@ -137,14 +89,14 @@ final class PluginService
     public static function checkForUpdateManually()
     {
         if (!wp_verify_nonce($_REQUEST['nonce'], PluginService::$check_update)) {
-            wp_die(__('Security check failed.', 'lexocaptcha'));
+            wp_die(PluginService::__('Security check failed.'));
         }
 
         if (!PluginService::updater()->hasNewUpdate()) {
             set_transient(
                 Core::$domain . '_no_updates_notice',
                 sprintf(
-                    __('Plugin %s is up to date.', 'lexocaptcha'),
+                    PluginService::__('Plugin %s is up to date.'),
                     Core::$plugin_name
                 ),
                 HOUR_IN_SECONDS,
@@ -167,12 +119,16 @@ final class PluginService
             return false;
         }
 
-        return wp_date(get_option('date_format') . ' ' . get_option('time_format'), $expiration_datetime);
+        return wp_date(
+            get_option('date_format') . ' ' . get_option('time_format'),
+            $expiration_datetime,
+        );
     }
 
     public static function noUpdatesNotice()
     {
         $message = get_transient(Core::$domain . '_no_updates_notice');
+
         delete_transient(Core::$domain . '_no_updates_notice');
 
         if (!$message) {
@@ -215,14 +171,17 @@ final class PluginService
         );
     }
 
-    public static function add_pages()
-    {
+    public static function add_pages() {
         StatisticsPage::add_page();
 
         add_filter(
             'plugin_action_links_' . Core::$basename,
             [PluginService::class, 'add_statistics_link'],
         );
+    }
+
+    public static function slug($name) {
+        return Core::$plugin_slug . "-{$name}";
     }
 
     public static function getManualUpdateCheckLink(): string
@@ -237,10 +196,10 @@ final class PluginService
             )
         );
     }
+
+    public static function __($text) {
+        return __($text, Core::$domain);
+    }
 }
 
-PluginService::$namespace = Core::$domain;
-
 PluginService::$check_update = 'check-update-' . Core::$plugin_slug;
-
-PluginService::$statistics_page_slug = 'statistics-' . Core::$plugin_slug;

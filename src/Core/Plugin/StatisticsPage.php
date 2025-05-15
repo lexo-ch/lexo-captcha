@@ -2,26 +2,17 @@
 
 namespace LEXO\Captcha\Core\Plugin;
 
-final class StatisticsPage
+use LEXO\Captcha\Core\Base\Page;
+
+final class StatisticsPage extends Page
 {
-    private function __construct()
-    {
-        //
+    const BASE_SLUG = 'statistics';
+
+    public static function title() {
+        return PluginService::__('LEXO Captcha Statistics');
     }
 
-    public static function add_page() {
-        add_submenu_page(
-            'lexoseo',
-            'Captcha Statistics',
-            'Captcha Statistics',
-            'administrator',
-            'lexo_captcha_stats',
-            [StatisticsPage::class, 'content'],
-        );
-    }
-
-    public static function content()
-    {
+    public static function content() {
         $statistics = json_decode(get_option(
             'lexo_captcha_statistics',
             '[]',

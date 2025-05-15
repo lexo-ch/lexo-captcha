@@ -3,7 +3,6 @@
 namespace LEXO\Captcha\Core\Loader;
 
 use LEXO\Captcha\Core;
-use LEXO\Captcha\Core\Plugin\PluginService;
 
 final class Loader
 {
@@ -36,7 +35,7 @@ final class Loader
     public static function load_admin_resources() {
         if (file_exists(self::resource('admin.js'))) {
             wp_enqueue_script(
-                PluginService::$namespace . "-admin-script",
+                Core::$domain . "-admin-script",
                 self::resource_url('admin.js'),
                 [],
                 md5_file(self::resource('admin.js')),
@@ -48,7 +47,7 @@ final class Loader
 
         if (file_exists(self::resource('admin.css'))) {
             wp_enqueue_style(
-                PluginService::$namespace . "-admin-styles",
+                Core::$domain . "-admin-styles",
                 self::resource_url('admin.css'),
                 [],
                 md5_file(self::resource('admin.css')),
@@ -59,7 +58,7 @@ final class Loader
     public static function load_front_resources() {
         if (file_exists(self::resource('front.js'))) {
             wp_enqueue_script(
-                PluginService::$namespace . "-front-script",
+                Core::$domain . "-front-script",
                 self::resource_url('front.js'),
                 [],
                 md5_file(self::resource('front.js')),
@@ -69,8 +68,8 @@ final class Loader
             );
 
             wp_localize_script(
-                PluginService::$namespace . "-front-script",
-                PluginService::$namespace . "_globals",
+                Core::$domain . "-front-script",
+                Core::$domain . "_globals",
                 [
                     'ajax_url' => admin_url('admin-ajax.php'),
                 ],
@@ -79,7 +78,7 @@ final class Loader
 
         if (file_exists(self::resource('front.css'))) {
             wp_enqueue_style(
-                PluginService::$namespace . "-front-styles",
+                Core::$domain . "-front-styles",
                 self::resource_url('front.css'),
                 [],
                 md5_file(self::resource('front.css')),
