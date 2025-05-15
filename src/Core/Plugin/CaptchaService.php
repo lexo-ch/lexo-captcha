@@ -182,9 +182,12 @@ final class CaptchaService {
 
         // client timestamp tolerance = 300000ms = 300s
 
-        $interaction_tolerance_timestamp = $timestamp + 300000;
+        $timestamp_tolerance = apply_filters(
+            PluginService::filter('client-timestamp-tolerance'),
+            300000,
+        );
 
-        if ($data['interacted'] > $interaction_tolerance_timestamp) {
+        if ($data['interacted'] > $timestamp + $timestamp_tolerance) {
             CaptchaService::append_statistics(
                 'Interaction data from the future, likely faked',
                 $timestamp,
@@ -199,7 +202,10 @@ final class CaptchaService {
 
         // 15000ms = 15s
 
-        $submit_cooldown = 15000;
+        $submit_cooldown = apply_filters(
+            PluginService::filter('submit-cooldown'),
+            15000,
+        );
         
         // Form sent within 15 seconds since token generation.
         if ($timestamp - $captcha_token_generation_timestamp < $submit_cooldown) {
@@ -221,10 +227,13 @@ final class CaptchaService {
 
         // 3600000ms = 1h
 
-        $interaction_max_age = 3600000;
+        $max_interaction_age = apply_filters(
+            PluginService::filter('max-interaction-age'),
+            3600000,
+        );
 
         // First interacted over an hour ago.
-        if ($timestamp - $data['interacted'] > $interaction_max_age) {
+        if ($timestamp - $data['interacted'] > $max_interaction_age) {
             CaptchaService::append_statistics(
                 'Interaction data too old',
                 $timestamp,
@@ -234,17 +243,20 @@ final class CaptchaService {
                 $captcha_token_generation_timestamp,
                 [
                     'interaction_age' => $timestamp - $data['interacted'],
-                    'interaction_max_age' => $interaction_max_age,
+                    'interaction_max_age' => $max_interaction_age,
                 ],
             );
 
             return false;
         }
 
-        $token_max_age = 3600000;
+        $max_token_age = apply_filters(
+            PluginService::filter('max-token-age'),
+            3600000,
+        );
 
         // Token generated over an hour ago.
-        if ($timestamp - $captcha_token_generation_timestamp > $token_max_age) {
+        if ($timestamp - $captcha_token_generation_timestamp > $max_token_age) {
             CaptchaService::append_statistics(
                 'Expired token',
                 $timestamp,
@@ -254,7 +266,7 @@ final class CaptchaService {
                 $captcha_token_generation_timestamp,
                 [
                     'token_age' => $timestamp - $captcha_token_generation_timestamp,
-                    'token_max_age' => $token_max_age,
+                    'token_max_age' => $max_token_age,
                 ],
             );
 

@@ -22,11 +22,6 @@ final class Bootloader
         );
 
         add_action(
-            Core::$domain . '/localize/admin-lexocaptcha.js',
-            [Bootloader::class, 'onAdminWebpcJsLoad'],
-        );
-
-        add_action(
             'after_setup_theme',
             [Bootloader::class, 'onAfterSetupTheme'],
         );
@@ -48,14 +43,12 @@ final class Bootloader
             [Bootloader::class, 'onAdminNotices'],
         );
 
-        Loader::run();
+        Loader::add_actions();
     }
 
     public static function onAdminInit()
     {
-        PluginService::updateMissingSettings();
-
-        PluginService::handleSaveSettings();
+        //
     }
 
     public static function onInit()
@@ -63,18 +56,11 @@ final class Bootloader
         do_action(Core::$domain . '/init');
 
         PluginService::registerNamespace();
-
-        PluginService::addSettingsLink();
     }
 
     public static function onAdminMenu()
     {
-        PluginService::addSettingsPage();
-    }
-
-    public static function onAdminWebpcJsLoad()
-    {
-        PluginService::addAdminLocalizedScripts();
+        PluginService::add_pages();
     }
 
     public static function onAdminNotices()

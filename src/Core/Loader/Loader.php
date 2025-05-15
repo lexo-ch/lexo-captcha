@@ -12,7 +12,7 @@ final class Loader
         //
     }
 
-    public static function run()
+    public static function add_actions()
     {
         add_action(
             'admin_enqueue_scripts',

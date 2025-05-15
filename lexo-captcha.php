@@ -111,16 +111,28 @@ if (!file_exists($composer)) {
 
     <?php
 
-    wp_die(trim(ob_get_clean()), 'lexocaptcha');
+    wp_die(
+        trim(ob_get_clean()),
+        'lexocaptcha',
+    );
 }
 
 require $composer;
 
-register_activation_hook(__FILE__, [Activation::class, 'run']);
+register_activation_hook(
+    __FILE__,
+    [Activation::class, 'run'],
+);
 
-register_deactivation_hook(__FILE__, [Deactivation::class, 'run']);
+register_deactivation_hook(
+    __FILE__,
+    [Deactivation::class, 'run'],
+);
 
-register_uninstall_hook(__FILE__, [Uninstalling::class, 'run']);
+register_uninstall_hook(
+    __FILE__,
+    [Uninstalling::class, 'run'],
+);
 
 try {
     Bootloader::run();

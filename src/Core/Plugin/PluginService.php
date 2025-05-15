@@ -21,17 +21,11 @@ final class PluginService
 
     public static string $manage_plugin_capability = 'administrator';
 
-    public static string $setting_parent_slug = 'options-general.php';
+    public static string $statistics_parent_slug = 'options-general.php';
 
-    public static string $setting_page_slug;
+    public static string $statistics_page_slug;
 
     public static bool $can_manage_plugin = false;
-
-    public static int $temp_disable_period = 0;
-
-    public static array $plugin_settings = [];
-
-    public static $settingsPage;
 
     public static function registerNamespace()
     {
@@ -39,90 +33,41 @@ final class PluginService
             PluginService::$can_manage_plugin = current_user_can(PluginService::getManagePluginCap());
         }
 
-        PluginService::$plugin_settings = PluginService::getPluginSettings();
-
-        PluginService::$settingsPage = new SettingsPage();
-
-        PluginService::$temp_disable_period = PluginService::getTemporaryDisablePeriod();
-
         add_action(
             'admin_post_' . PluginService::$check_update,
             [PluginService::class, 'checkForUpdateManually'],
         );
 
         add_action(
-            'admin_post_toggle_webp_converter',
+            'admin_post_toggle_lexo_captcha',
             [PluginService::class, 'handleToggleCaptchaonverter'],
         );
     }
 
-    public static function handleSaveSettings()
-    {
-        add_action(
-            'admin_post_save_' . Core::$field_name,
-            [PluginService::class, 'saveSettings'],
-        );
-    }
-
-    public static function saveSettings()
-    {
-        if (!current_user_can(PluginService::getManagePluginCap())) {
-            wp_die(__('This user doesn\'t have permission to run this plugin.', 'lexocaptcha'));
-        }
-
-        check_admin_referer(Core::$field_name);
-
-        $settings = PluginService::$plugin_settings;
-
-        update_option(Core::$field_name, $settings);
-
-        set_transient(
-            Core::$domain . '_update_success_notice',
-            sprintf(
-                __('The settings for %s have been successfully saved.', 'lexocaptcha'),
-                Core::$field_name
-            ),
-            HOUR_IN_SECONDS
-        );
-
-        wp_safe_redirect(PluginService::getOptionsLink());
-
-        exit;
+    public static function filter($name) {
+        return trailingslashit(PluginService::$namespace) . $name;
     }
 
     public static function getManagePluginCap()
     {
         $capability = PluginService::$manage_plugin_capability;
 
-        $capability = apply_filters(PluginService::$namespace . '/options-page/capability', $capability);
+        $capability = apply_filters(
+            PluginService::filter('options-page/capability'),
+            $capability,
+        );
 
         return $capability;
     }
 
-    public static function getDisableMsgDateFormat(): string
+    public static function get_statistics_page_parent_slug()
     {
-        $date_format = 'd.m.Y H:i:s';
-        return apply_filters(PluginService::$namespace . '/dashboard-widget/date-format', $date_format);
-    }
+        $slug = PluginService::$statistics_parent_slug;
 
-    public static function getTemporaryDisablePeriod(): int
-    {
-        $default_period = 60; // minutes
-
-        $filtered_period = apply_filters(PluginService::$namespace . '/temporary-disable-period', $default_period);
-
-        if (!is_numeric($filtered_period) || $filtered_period <= 0) {
-            return 0;
-        }
-
-        return (int) $filtered_period * 60; // Convert minutes to seconds
-    }
-
-    public static function getSettingsPageParentSlug()
-    {
-        $slug = PluginService::$setting_parent_slug;
-
-        $slug = apply_filters(PluginService::$namespace . '/options-page/parent-slug', $slug);
+        $slug = apply_filters(
+            PluginService::filter('options-page/parent-slug'),
+            $slug,
+        );
 
         return $slug;
     }
@@ -138,22 +83,17 @@ final class PluginService
             'text_domain'       => Core::$domain
         ];
 
-        $vars = apply_filters(PluginService::$namespace . '/admin_localized_script', $vars);
+        $vars = apply_filters(
+            PluginService::filter('admin_localized_script'),
+            $vars,
+        );
 
         wp_localize_script(trailingslashit(PluginService::$namespace) . 'admin-' . Core::$domain . '.js', Core::$domain . 'AdminLocalized', $vars);
     }
 
-    public static function addSettingsLink()
+    public static function get_statistics_link()
     {
-        add_filter(
-            'plugin_action_links_' . Core::$basename,
-            [PluginService::class, 'setSettingsLink'],
-        );
-    }
-
-    public static function getOptionsLink()
-    {
-        $path = PluginService::getSettingsPageParentSlug();
+        $path = PluginService::get_statistics_page_parent_slug();
 
         if (strpos($path, '.php') === false) {
             $path = 'admin.php';
@@ -162,17 +102,17 @@ final class PluginService
         return esc_url(
             add_query_arg(
                 'page',
-                PluginService::$setting_page_slug,
+                PluginService::$statistics_page_slug,
                 admin_url($path)
             )
         );
     }
 
-    public static function setSettingsLink($links)
+    public static function add_statistics_link($links)
     {
-        $url = PluginService::getOptionsLink();
+        $url = PluginService::get_statistics_link();
 
-        $settings_link = "<a href='{$url}'>" . __('Settings', 'lexocaptcha') . '</a>';
+        $settings_link = "<a href='{$url}'>" . __('Statistics', 'lexocaptcha') . '</a>';
 
         array_push(
             $links,
@@ -209,10 +149,10 @@ final class PluginService
                 ),
                 HOUR_IN_SECONDS,
             );
-
-            wp_safe_redirect(PluginService::getOptionsLink());
-        } else {
+        }
+        else {
             delete_transient(Core::$cache_key);
+            
             wp_safe_redirect(admin_url('plugins.php'));
         }
 
@@ -255,6 +195,7 @@ final class PluginService
     public static function updateSuccessNotice()
     {
         $message = get_transient(Core::$domain . '_update_success_notice');
+
         delete_transient(Core::$domain . '_update_success_notice');
 
         if (!$message) {
@@ -274,77 +215,14 @@ final class PluginService
         );
     }
 
-    public static function addSettingsPage()
+    public static function add_pages()
     {
-        add_submenu_page(
-            PluginService::getSettingsPageParentSlug(),
-            __('LEXO Captcha', 'lexocaptcha'),
-            __('LEXO Captcha', 'lexocaptcha'),
-            PluginService::getManagePluginCap(),
-            PluginService::$setting_page_slug,
-            function() {
-                SettingsPage::getSettingsPageContent();
-            }
+        StatisticsPage::add_page();
+
+        add_filter(
+            'plugin_action_links_' . Core::$basename,
+            [PluginService::class, 'add_statistics_link'],
         );
-    }
-
-    public static function getInitSettings(): array
-    {
-        return [
-            'temporary_disable_timestamp' => 0
-        ];
-    }
-
-    private static function mergeSettingsAndUpdateOption($currentSettings, $defaultSettings)
-    {
-        // Flag to track if there are any changes
-        $isChanged = false;
-
-        foreach ($defaultSettings as $key => $value) {
-            if (!isset($currentSettings[$key])) {
-                $currentSettings[$key] = $value;
-                $isChanged = true; // Mark as changed
-            } elseif (is_array($value)) {
-                // Recursively merge sub-arrays and check for changes
-                list($mergedSubArray, $subArrayChanged) = PluginService::mergeSettingsAndUpdateOption($currentSettings[$key], $value);
-                $currentSettings[$key] = $mergedSubArray;
-                if ($subArrayChanged) {
-                    $isChanged = true; // Propagate change flag
-                }
-            }
-        }
-
-        if ($isChanged) {
-            // Update the WordPress option only if there are changes
-            update_option(Core::$field_name, $currentSettings);
-        }
-
-        // Return the merged settings and the change flag
-        return array($currentSettings, $isChanged);
-    }
-
-    public static function updateMissingSettings()
-    {
-        PluginService::mergeSettingsAndUpdateOption(
-            get_option(Core::$field_name),
-            PluginService::getInitSettings()
-        );
-    }
-
-    public static function getPluginSettings()
-    {
-        return wp_parse_args(get_option(Core::$field_name, []), PluginService::getInitSettings());
-    }
-
-    public static function getSettingsPageFields(): array
-    {
-        $settings = PluginService::$plugin_settings;
-
-        if (!$settings) {
-            return [];
-        }
-
-        return [];
     }
 
     public static function getManualUpdateCheckLink(): string
@@ -359,111 +237,10 @@ final class PluginService
             )
         );
     }
-
-    public static function isTemporarilyDisabled(): bool
-    {
-        $timestamp = PluginService::$plugin_settings['temporary_disable_timestamp'];
-
-        $current_time = current_time('timestamp');
-
-        if ($timestamp > 0 && ($timestamp + PluginService::$temp_disable_period) > $current_time) {
-            return true;
-        }
-
-        // Reset and trigger temporary-disablement-has-ended action if time has expired
-        if ($timestamp > 0 && ($timestamp + PluginService::$temp_disable_period) <= $current_time) {
-            PluginService::enablePlugin();
-        }
-
-        return false;
-    }
-
-    public static function getDisableMessage(): string
-    {
-        return sprintf(
-            __('The %s plugin (<b>image optimization</b>) is temporarily disabled until <b>%s</b>.', 'lexocaptcha'),
-            Core::$plugin_name,
-            date(
-                PluginService::getDisableMsgDateFormat(),
-                PluginService::$plugin_settings['temporary_disable_timestamp'] + PluginService::$temp_disable_period
-            )
-        );
-    }
-
-    private static function enablePlugin()
-    {
-        $was_disabled = PluginService::$plugin_settings['temporary_disable_timestamp'] > 0;
-        PluginService::$plugin_settings['temporary_disable_timestamp'] = 0;
-        update_option(Core::$field_name, PluginService::$plugin_settings);
-
-        if ($was_disabled) {
-            do_action(Core::$domain . '/temporary-disablement-has-ended');
-        }
-    }
-
-    private static function disablePlugin()
-    {
-        PluginService::$plugin_settings['temporary_disable_timestamp'] = current_time('timestamp');
-        update_option(Core::$field_name, PluginService::$plugin_settings);
-
-        do_action(Core::$domain . '/plugin-temporarily-disabled');
-    }
-
-    public function addTemporaryDisableNotice()
-    {
-        if (!PluginService::isTemporarilyDisabled()) {
-            return false;
-        }
-
-        $message = $this->getDisableMessage();
-
-        wp_admin_notice(
-            $message,
-            [
-                'type'        => 'info',
-                'dismissible' => false,
-                'attributes'  => [
-                    'data-slug'   => Core::$plugin_slug,
-                    'data-action' => 'temp-disable'
-                ]
-            ]
-        );
-    }
-
-    private function infoDisableMessage(int $seconds): string
-    {
-        $time_display = PluginService::convertSecondsToHoursAndMinutes($seconds);
-
-        return sprintf(
-            __(
-                'If you disable image optimization, uploaded images will not be automatically converted and optimized for the web in WebP format for <strong>%s</strong>. The function will then be automatically reactivated. You can enable image optimization at any time before this period expires.',
-                'lexocaptcha'
-            ),
-            $time_display
-        );
-    }
-
-    public function handleToggleCaptchaonverter()
-    {
-        if (!current_user_can(PluginService::getManagePluginCap())) {
-            wp_die(__('This user doesn\'t have permission to run this plugin.', 'lexocaptcha'));
-        }
-
-        check_admin_referer('toggle_webp_converter');
-
-        if (isset($_POST['disable_plugin'])) {
-            PluginService::disablePlugin();
-        } else {
-            PluginService::enablePlugin();
-        }
-
-        wp_safe_redirect(admin_url());
-        exit;
-    }
 }
 
 PluginService::$namespace = Core::$domain;
 
 PluginService::$check_update = 'check-update-' . Core::$plugin_slug;
 
-PluginService::$setting_page_slug = 'settings-' . Core::$plugin_slug;
+PluginService::$statistics_page_slug = 'statistics-' . Core::$plugin_slug;

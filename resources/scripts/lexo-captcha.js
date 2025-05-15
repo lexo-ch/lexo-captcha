@@ -1,306 +1,375 @@
 class LEXO_Captcha {
-    #interacted = null;
+	/**
+	 * @type {number?}
+	 */
+	#interacted = null;
 
-    #InteractionEvents = [
-        'keydown',
-        'mousemove',
-        'touchmove',
-    ];
+	#interaction_events = [
+		'keydown',
+		'mousemove',
+		'touchmove',
+	];
 
-    #recordInteraction = () => {
-        if (this.#interacted) {
-            return;
-        }
+	#record_interaction = () => {
+		if (this.#interacted) {
+			return;
+		}
 
-        this.#interacted = Date.now();
+		this.#interacted = Date.now();
 
-        for (const interaction_event of this.#InteractionEvents) {
-            document.removeEventListener(interaction_event, this.#recordInteraction);
-        }
-    }
+		for (const interaction_event of this.#interaction_events) {
+			document.removeEventListener(interaction_event, this.#record_interaction);
+		}
+	};
 
-    /**
-     * @type null|Promise
+	/**
+     * @type {Promise?}
      */
-    #tokenReady = null;
+	#token_ready = null;
 
-    async requestToken() {
-        const Data = new FormData();
+	async requestToken() {
+		if (this.#token_ready) {
+			await this.#token_ready;
 
-        Data.append('action', 'lexo_captcha_request_token');
+			return;
+		}
 
-        this.#tokenReady = new Promise(async resolve => {
-            const Response = await fetch(lexocaptcha_globals.ajax_url, {
-                method: 'POST',
-                body: Data,
-            });
+		localStorage.removeItem('lexo_captcha_token');
+		localStorage.removeItem('lexo_captcha_token_recieval_timestamp');
 
-            localStorage.setItem('lexo_captcha_token', await Response.text());
-            localStorage.setItem('lexo_captcha_token_recieval_timestamp', Date.now());
+		const data = new FormData();
 
-            resolve();
+		data.append('action', 'lexo_captcha_request_token');
 
-            this.#tokenReady = null;
-        });
-    }
+		this.#token_ready = new Promise(async resolve => {
+			const response = await fetch(lexocaptcha_globals.ajax_url, {
+				method: 'POST',
+				body: data,
+			});
 
-    #requestSubmit() {
-        return new Promise(async (resolve, reject) => {
-            if (!localStorage.getItem('lexo_captcha_token_recieval_timestamp')) {
-                if (!this.#tokenReady)
-                    return reject('No token requested.');
+			localStorage.setItem('lexo_captcha_token', await response.text());
+			localStorage.setItem('lexo_captcha_token_recieval_timestamp', Date.now());
 
-                await this.#tokenReady;
-            }
+			resolve();
 
-            setTimeout(
-                () => resolve(),
-                Number(localStorage.getItem('lexo_captcha_token_recieval_timestamp')) + 15000 - Date.now(),
-            );
-        });
-    }
+			this.#token_ready = null;
+		});
 
-    async compileData() {
-        await this.#requestSubmit();
+		await this.#token_ready;
+	}
 
-        const data = JSON.stringify({
-            'interacted': this.#interacted,
-            'token': localStorage.getItem('lexo_captcha_token'),
-        });
+	#request_submit() {
+		return new Promise(async (resolve, reject) => {
+			if (!localStorage.getItem('lexo_captcha_token_recieval_timestamp')) {
+				await this.requestToken();
+			}
 
-        localStorage.removeItem('lexo_captcha_token');
-        localStorage.removeItem('lexo_captcha_token_recieval_timestamp');
+			setTimeout(
+				() => resolve(),
+				Number(localStorage.getItem('lexo_captcha_token_recieval_timestamp')) + 15000 - Date.now(),
+			);
+		});
+	}
+
+	async compileData() {
+		await this.#request_submit();
 
-        return data;
-    }
-
-    #notify(message) {
-        if (!message.length) {
-            message = 'Error: Message not send! Please try again.';
-        }
-
-        const Notification = document.createElement('div');
-
-        Notification.id = 'l-notify';
-        Notification.innerHTML = message;
-
-        document.body.append(Notification);
-
-        setTimeout(() => Notification.classList.add('active'), 100);
-
-        setTimeout(() => {
-            Notification.classList.remove('active');
-
-            setTimeout(() => Notification.remove(), 250);
-        }, 5000);
-    }
-
-    #addFormEvents(Form) {
-        Form.addEventListener('submit', event => {
-            event.preventDefault();
-
-            return false;
-        });
-
-        Form.addEventListener('mouseover', event => {
-            const Target = event?.target?.closest?.('em');
-
-            if (!Target)
-                return;
-
-            if (!Target.classList.contains('hover-active')) {
-                for (const ErrorElem of Form.querySelectorAll('em, em span.error')) {
-                    ErrorElem.classList.remove('hover-active');
-                }
-
-                for (const ErrorSpan of Target.querySelectorAll('span.error')) {
-                    ErrorSpan.classList.add('hover-active');
-                }
-
-                Target.classList.add('hover-active');
-            }
-        });
-
-        Form.addEventListener('mouseout', event => {
-            const Target = event?.target?.closest?.('em, span.error');
-
-            if (!Target)
-                return;
-
-            if (Target.classList.contains('hover-active')) {
-                for (const ErrorElem of Form.querySelectorAll('em, em span.error')) {
-                    ErrorElem.classList.remove('hover-active');
-                }
-            }
-        });
-    }
-
-    handleGenericForm(GenericForm, field_selector) {
-        let spam = false;
-
-        this.#addFormEvents(GenericForm);
-
-        jQuery(GenericForm).validate({
-            errorElement: 'span',
-            wrapper: 'em',
-            highlight: (element, errorClass, validClass) => {
-                jQuery(element).addClass(errorClass).removeClass(validClass);
-            },
-            submitHandler: async () => {
-                if (spam) {
-                    return;
-                }
-
-                for (const SubmitButton of GenericForm.querySelectorAll('[type="submit"]')) {
-                    SubmitButton.disabled = true;
-                }
-
-                spam = true;
-
-                const Data = new FormData();
-
-                Data.append(
-                    'form_fields',
-                    JSON.stringify(
-                        jQuery(GenericForm).find(field_selector).serializeArray()
-                    ),
-                );
-
-                Data.append(
-                    'action',
-                    GenericForm.dataset.action,
-                );
-
-                if (typeof currentLang !== 'undefined') {
-                    Data.append(
-                        'sender_language',
-                        currentLang,
-                    );
-                }
-
-                Data.append(
-                    'page',
-                    window.location.href,
-                );
-
-                Data.append(
-                    'lexo_captcha_data',
-                    await this.compileData(),
-                );
-
-                const Response = await fetch(lexocaptcha_globals.ajax_url, {
-                    method: 'POST',
-                    body: Data,
-                });
-
-                this.#notify(await Response.text());
-
-                GenericForm.reset();
-
-                for (const FieldWrapper of GenericForm.querySelectorAll('.cf-field-wrapper')) {
-                    FieldWrapper.classList.remove('hasValue');
-                }
-
-                spam = false;
-
-                for (const SubmitButton of GenericForm.querySelectorAll('[type="submit"]')) {
-                    SubmitButton.disabled = false;
-                }
-
-                this.requestToken();
-            }
-        });
-    }
-
-    handleAllGenericForms(field_selector = '.send_field') {
-        for (const GenericForm of document.querySelectorAll('form[data-action]')) {
-            this.handleGenericForm(GenericForm, field_selector);
-        }
-    }
-
-    handleAdvancedForm(AdvancedForm) {
-        let spam = false;
-
-        this.#addFormEvents(AdvancedForm);
-
-        jQuery(AdvancedForm).validate({
-            errorElement: 'span',
-            wrapper: 'em',
-            highlight: (element, errorClass, validClass) => {
-                jQuery(element).addClass(errorClass).removeClass(validClass);
-            },
-            submitHandler: async () => {
-                if (spam) {
-                    return;
-                }
-
-                for (const SubmitButton of AdvancedForm.querySelectorAll('[type="submit"]')) {
-                    SubmitButton.disabled = true;
-                }
-
-                spam = true;
-
-                const Data = new FormData(AdvancedForm);
-
-                Data.append(
-                    'action',
-                    AdvancedForm.dataset.action,
-                );
-
-                if (typeof currentLang !== 'undefined') {
-                    Data.append(
-                        'sender_language',
-                        currentLang,
-                    );
-                }
-
-                Data.append(
-                    'page',
-                    window.location.href,
-                );
-
-                Data.append(
-                    'lexo_captcha_data',
-                    await this.compileData(),
-                );
-
-                const Response = await fetch(lexocaptcha_globals.ajax_url, {
-                    method: 'POST',
-                    body: Data,
-                });
-
-                this.#notify(await Response.text());
-
-                AdvancedForm.reset();
-
-                for (const FieldWrapper of AdvancedForm.querySelectorAll('.cf-field-wrapper')) {
-                    FieldWrapper.classList.remove('hasValue');
-                }
-
-                spam = false;
-
-                for (const SubmitButton of AdvancedForm.querySelectorAll('[type="submit"]')) {
-                    SubmitButton.disabled = false;
-                }
-
-                this.requestToken();
-            }
-        });
-    }
-
-    handleAllAdvancedForms() {
-        for (const AdvancedForm of document.querySelectorAll('form[data-action]')) {
-            this.handleAdvancedForm(AdvancedForm);
-        }
-    }
-
-    constructor() {
-        for (const interaction_event of this.#InteractionEvents) {
-            document.addEventListener(interaction_event, this.#recordInteraction);
-        }
-
-        this.requestToken();
-
-        Object.seal(this);
-    }
-};
+		const data = JSON.stringify({
+			'interacted': this.#interacted,
+			'token': localStorage.getItem('lexo_captcha_token'),
+		});
+
+		localStorage.removeItem('lexo_captcha_token');
+		localStorage.removeItem('lexo_captcha_token_recieval_timestamp');
+
+		return data;
+	}
+
+	/**
+	 * @param {string} message
+	 */
+	#notify(message) {
+		if (!message.length) {
+			message = 'Error: Message not send! Please try again.';
+		}
+
+		const notification = document.createElement('div');
+
+		notification.id = 'l-notify';
+		notification.innerHTML = message;
+
+		document.body.append(notification);
+
+		setTimeout(() => notification.classList.add('active'), 100);
+
+		setTimeout(() => {
+			notification.classList.remove('active');
+
+			setTimeout(() => notification.remove(), 250);
+		}, 5000);
+	}
+
+	/**
+	 * @param {HTMLFormElement} form
+	 */
+	#add_form_events(form) {
+		form.addEventListener('submit', event => {
+			event.preventDefault();
+
+			return false;
+		});
+
+		form.addEventListener('mouseover', event => {
+			const target = event?.target?.closest?.('em');
+
+			if (!target) {
+				return;
+			}
+
+			if (!target.classList.contains('hover-active')) {
+				for (const error_element of form.querySelectorAll('em, em span.error')) {
+					error_element.classList.remove('hover-active');
+				}
+
+				for (const error_span of target.querySelectorAll('span.error')) {
+					error_span.classList.add('hover-active');
+				}
+
+				target.classList.add('hover-active');
+			}
+		});
+
+		form.addEventListener('mouseout', event => {
+			const target = event?.target?.closest?.('em, span.error');
+
+			if (!target) {
+				return;
+			}
+
+			if (target.classList.contains('hover-active')) {
+				for (const error_element of form.querySelectorAll('em, em span.error')) {
+					error_element.classList.remove('hover-active');
+				}
+			}
+		});
+	}
+
+	/**
+	 * @deprecated use `initialise_legacy_form()` instead.
+	 */
+	handleGenericForm(form, field_selector) {
+		this.initialise_legacy_form(form, field_selector);
+	}
+
+	/**
+	 * Initialise a legacy captcha form, using **JSON** to transfer data.
+	 *
+	 * @param {HTMLFormElement} form
+	 * @param {keyof HTMLElementTagNameMap} field_selector
+	 */
+	initialise_legacy_form(form, field_selector) {
+		let spam = false;
+
+		this.#add_form_events(form);
+
+		jQuery(form).validate({
+			errorElement: 'span',
+			wrapper: 'em',
+			highlight: (element, error_class, valid_class) => {
+				jQuery(element).addClass(error_class).removeClass(valid_class);
+			},
+			submitHandler: async () => {
+				if (spam) {
+					return;
+				}
+
+				const submit_buttons = form.querySelectorAll('[type="submit"]');
+
+				for (const submit_button of submit_buttons) {
+					submit_button.disabled = true;
+				}
+
+				spam = true;
+
+				const body = new FormData();
+
+				body.append(
+					'form_fields',
+					JSON.stringify(
+						jQuery(form).find(field_selector).serializeArray()
+					),
+				);
+
+				body.append(
+					'action',
+					form.dataset.action,
+				);
+
+				if (typeof currentLang !== 'undefined') {
+					body.append(
+						'sender_language',
+						currentLang,
+					);
+				}
+
+				body.append(
+					'page',
+					window.location.href,
+				);
+
+				body.append(
+					'lexo_captcha_data',
+					await this.compileData(),
+				);
+
+				const response = await fetch(lexocaptcha_globals.ajax_url, {
+					method: 'POST',
+					body: body,
+				});
+
+				this.#notify(await response.text());
+
+				form.reset();
+
+				for (const field_wrapper of form.querySelectorAll('.cf-field-wrapper')) {
+					field_wrapper.classList.remove('hasValue');
+				}
+
+				spam = false;
+
+				for (const submit_button of submit_buttons) {
+					submit_button.disabled = false;
+				}
+
+				this.requestToken();
+			}
+		});
+	}
+
+	/**
+	 * @deprecated use `initialise_all_legacy_forms()` instead.
+	 */
+	handleAllGenericForms(field_selector = '.send_field') {
+		this.initialise_all_legacy_forms(field_selector);
+	}
+
+	/**
+	 * @param {keyof HTMLElementTagNameMap} field_selector
+	 */
+	initialise_all_legacy_forms(field_selector = '.send_field') {
+		for (const form of document.querySelectorAll('form[data-action]')) {
+			this.initialise_legacy_form(form, field_selector);
+		}
+	}
+
+	/**
+	 * @deprecated use `initialise_form()` intsead.
+	 */
+	handleAdvancedForm(form) {
+		this.initialise_form(form);
+	}
+
+	/**
+	 * Initialise a captcha form, using `FormData` to transfer data.
+	 *
+	 * @param {HTMLFormElement} form
+	 */
+	initialise_form(form) {
+		let spam = false;
+
+		this.#add_form_events(form);
+
+		jQuery(form).validate({
+			errorElement: 'span',
+			wrapper: 'em',
+			highlight: (element, error_class, valid_class) => {
+				jQuery(element).addClass(error_class).removeClass(valid_class);
+			},
+			submitHandler: async () => {
+				if (spam) {
+					return;
+				}
+
+				const submit_buttons = form.querySelectorAll('[type="submit"]');
+
+				for (const submit_button of submit_buttons) {
+					submit_button.disabled = true;
+				}
+
+				spam = true;
+
+				const body = new FormData(form);
+
+				body.append(
+					'action',
+					form.dataset.action,
+				);
+
+				if (typeof currentLang !== 'undefined') {
+					body.append(
+						'sender_language',
+						currentLang,
+					);
+				}
+
+				body.append(
+					'page',
+					window.location.href,
+				);
+
+				body.append(
+					'lexo_captcha_data',
+					await this.compileData(),
+				);
+
+				const response = await fetch(lexocaptcha_globals.ajax_url, {
+					method: 'POST',
+					body: body,
+				});
+
+				const data = await response.json();
+
+				this.#notify(data.message);
+
+				if (data.success) {
+					form.reset();
+
+					for (const field_wrapper of form.querySelectorAll('.cf-field-wrapper')) {
+						field_wrapper.classList.remove('hasValue');
+					}
+				}
+
+				spam = false;
+
+				for (const submit_button of submit_buttons) {
+					submit_button.disabled = false;
+				}
+
+				this.requestToken();
+			}
+		});
+	}
+
+	/**
+	 * @deprecated use `initialise_all_forms()` instead.
+	 */
+	handleAllAdvancedForms() {
+		this.initialise_all_forms();
+	}
+
+	initialise_all_forms() {
+		for (const form of document.querySelectorAll('form[data-action]')) {
+			this.initialise_form(form);
+		}
+	}
+
+	constructor() {
+		for (const interaction_event of this.#interaction_events) {
+			document.addEventListener(interaction_event, this.#record_interaction);
+		}
+
+		this.requestToken();
+
+		Object.seal(this);
+	}
+}

@@ -8,6 +8,9 @@ export default [{
 	languageOptions: {
 		globals: {
 			...globals.browser,
+			'jQuery': true,
+			'lexocaptcha_globals': true,
+			'currentLang': true,
 		},
 	},
 	rules: {
@@ -172,7 +175,7 @@ export default [{
 			after: true
 		}],
 		'@stylistic/implicit-arrow-linebreak': ['error', 'beside'],
-		'@stylistic/indent': ['warn', 2],
+		'@stylistic/indent': ['warn', 'tab'],
 		'@stylistic/indent-binary-ops': ['warn', 'tab'],
 		'@stylistic/key-spacing': ['warn', {
 			beforeColon: false,
