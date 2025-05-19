@@ -14,25 +14,28 @@ export default defineConfig({
 				chunkFileNames: '[name].js',
 				assetFileNames: '[name].[ext]',
 			},
-			treeshake: false, // This is the key setting: disable tree-shaking to preserve unexported variables
+			treeshake: false,
 		},
 		target: 'esnext',
 		minify: 'terser',
 		terserOptions: {
-			mangle: false, // Disable name mangling
-			keep_fnames: true, // Keep function names
+			mangle: false,
+			keep_fnames: true,
 			compress: {
 				keep_infinity: true,
 				drop_console: false,
-				keep_classnames: true, // Preserve class names
-				keep_fargs: true, // Keep function arguments
-				pure_getters: false, // Don't remove unused getters
-				unused: false, // Don't remove unused variables and functions
-				dead_code: false, // Don't remove unreachable code
+				keep_classnames: true,
+				keep_fargs: true,
+				unused: false,
+				dead_code: false,
 			},
 			format: {
 				comments: false,
 			},
 		},
+	},
+	watch: {
+		include: ['resources/**'],
+		exclude: ['node_modules/**', 'dist/**'],
 	},
 });
