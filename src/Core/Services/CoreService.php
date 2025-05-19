@@ -29,29 +29,6 @@ final class CoreService
         return trailingslashit(Core::$domain) . $name;
     }
 
-    public static function addAdminLocalizedScripts()
-    {
-        $vars = [
-            'plugin_name'       => Core::$plugin_name,
-            'plugin_slug'       => Core::$plugin_slug,
-            'plugin_version'    => Core::$version,
-            'min_php_version'   => Core::$min_php_version,
-            'min_wp_version'    => Core::$min_wp_version,
-            'text_domain'       => Core::$domain
-        ];
-
-        $vars = apply_filters(
-            self::filter('admin_localized_script'),
-            $vars,
-        );
-
-        wp_localize_script(
-            trailingslashit(Core::$domain) . 'admin-' . Core::$domain . '.js',
-            Core::$domain . 'AdminLocalized',
-            $vars,
-        );
-    }
-
     public static function add_pages() {
         StatisticsPage::add_page();
 

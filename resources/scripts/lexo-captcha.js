@@ -1,4 +1,4 @@
-class LEXO_Captcha {
+const LEXO_Captcha = new (class {
 	/**
 	 * @type {number?}
 	 */
@@ -222,12 +222,12 @@ class LEXO_Captcha {
 					await this.compileData(),
 				);
 
-				const response = await fetch(lexocaptcha_globals.ajax_url, {
+				const response = await (await fetch(lexocaptcha_globals.ajax_url, {
 					method: 'POST',
 					body: body,
-				});
+				})).text();
 
-				this.#notify(await response.text());
+				this.#notify(response);
 
 				form.reset();
 
@@ -322,16 +322,14 @@ class LEXO_Captcha {
 					await this.compileData(),
 				);
 
-				const response = await fetch(lexocaptcha_globals.ajax_url, {
+				const response = await (await fetch(lexocaptcha_globals.ajax_url, {
 					method: 'POST',
 					body: body,
-				});
+				})).json();
 
-				const data = await response.json();
+				this.#notify(response.data);
 
-				this.#notify(data.message);
-
-				if (data.success) {
+				if (response.success) {
 					form.reset();
 
 					for (const field_wrapper of form.querySelectorAll('.cf-field-wrapper')) {
@@ -372,4 +370,4 @@ class LEXO_Captcha {
 
 		Object.seal(this);
 	}
-}
+});

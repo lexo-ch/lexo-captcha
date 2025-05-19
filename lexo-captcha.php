@@ -58,83 +58,79 @@ final class Core {
 
     public static string $update_path;
 
-    public static string $original_name_addition;
-
     const BASE_CAPABILITY = 'administrator';
 }
 
-$file_data = get_file_data(__FILE__, [
-    'Plugin Name' => 'Plugin Name',
-    'Update URI' => 'Update URI',
-    'Version' => 'Version',
-    'Requires PHP' => 'Requires PHP',
-    'Requires at least' => 'Requires at least',
-    'Text Domain' => 'Text Domain',
-]);
-
-Core::$plugin_name = $file_data['Plugin Name'];
-
-Core::$plugin_slug = $file_data['Update URI'];
-
-Core::$basename = plugin_basename(__FILE__);
-
-Core::$path = plugin_dir_path(__FILE__);
-
-Core::$url = plugin_dir_url(__FILE__);
-
-Core::$version = $file_data['Version'];
-
-Core::$min_php_version = $file_data['Requires PHP'];
-
-Core::$min_wp_version = $file_data['Requires at least'];
-
-Core::$domain = $file_data['Text Domain'];
-
-Core::$locales = 'languages';
-
-Core::$cache_key = Core::$domain . '_cache_key_update';
-
-Core::$update_path = 'https://wprepo.lexo.ch/public/lexo-captcha/info.json';
-
-Core::$original_name_addition = '---lexocaptcha-original---';
-
-$composer = Core::$path . '/vendor/autoload.php';
-
-if (!file_exists($composer)) {
-    ob_start();
-
-    ?>
-
-    Error locating autoloader in LEXO Captcha.
-
-    Please run a following command: <pre>composer install</pre>
-
-    <?php
-
-    wp_die(
-        trim(ob_get_clean()),
-        'lexocaptcha',
-    );
-}
-
-require $composer;
-
-register_activation_hook(
-    __FILE__,
-    [Activation::class, 'run'],
-);
-
-register_deactivation_hook(
-    __FILE__,
-    [Deactivation::class, 'run'],
-);
-
-register_uninstall_hook(
-    __FILE__,
-    [Uninstalling::class, 'run'],
-);
-
 try {
+    $file_data = get_file_data(__FILE__, [
+        'Plugin Name' => 'Plugin Name',
+        'Update URI' => 'Update URI',
+        'Version' => 'Version',
+        'Requires PHP' => 'Requires PHP',
+        'Requires at least' => 'Requires at least',
+        'Text Domain' => 'Text Domain',
+    ]);
+
+    Core::$plugin_name = $file_data['Plugin Name'];
+
+    Core::$plugin_slug = $file_data['Update URI'];
+
+    Core::$basename = plugin_basename(__FILE__);
+
+    Core::$path = plugin_dir_path(__FILE__);
+
+    Core::$url = plugin_dir_url(__FILE__);
+
+    Core::$version = $file_data['Version'];
+
+    Core::$min_php_version = $file_data['Requires PHP'];
+
+    Core::$min_wp_version = $file_data['Requires at least'];
+
+    Core::$domain = $file_data['Text Domain'];
+
+    Core::$locales = 'languages';
+
+    Core::$cache_key = Core::$domain . '_cache_key_update';
+
+    Core::$update_path = 'https://wprepo.lexo.ch/public/lexo-captcha/info.json';
+
+    $composer = Core::$path . '/vendor/autoload.php';
+
+    if (!file_exists($composer)) {
+        ob_start();
+
+        ?>
+
+        Error locating autoloader in LEXO Captcha.
+
+        Please run a following command: <pre>composer install</pre>
+
+        <?php
+
+        wp_die(
+            trim(ob_get_clean()),
+            'lexocaptcha',
+        );
+    }
+
+    require $composer;
+
+    register_activation_hook(
+        __FILE__,
+        [Activation::class, 'run'],
+    );
+
+    register_deactivation_hook(
+        __FILE__,
+        [Deactivation::class, 'run'],
+    );
+
+    register_uninstall_hook(
+        __FILE__,
+        [Uninstalling::class, 'run'],
+    );
+
     Bootloader::run();
 } catch (Exception $e) {
     require_once(ABSPATH . 'wp-admin/includes/plugin.php');

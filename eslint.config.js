@@ -186,7 +186,6 @@ export default [{
 			before: true,
 			after: true
 		}],
-		'@stylistic/new-parens': 'error',
 		'@stylistic/no-confusing-arrow': 'warn',
 		'@stylistic/no-extra-semi': 'warn',
 		'@stylistic/no-floating-decimal': 'error',

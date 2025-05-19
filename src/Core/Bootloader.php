@@ -4,6 +4,7 @@ namespace LEXO\Captcha\Core;
 
 use LEXO\Captcha\Core;
 use LEXO\Captcha\Core\Loader;
+use LEXO\Captcha\Core\Services\CaptchaService;
 use LEXO\Captcha\Core\Updater;
 use LEXO\Captcha\Core\Services\CoreService;
 
@@ -55,6 +56,8 @@ final class Bootloader
         do_action(CoreService::action('init'));
 
         Loader::setup();
+
+        CaptchaService::add_ajax_routes();
     }
 
     public static function admin_menu()

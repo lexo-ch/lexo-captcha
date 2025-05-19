@@ -52,6 +52,18 @@ final class CaptchaService {
         exit;
     }
 
+    public static function add_ajax_routes() {
+        add_action(
+            'wp_ajax_lexo_captcha_request_token',
+            [self::class, 'request_token'],
+        );
+
+        add_action(
+            'wp_ajax_nopriv_lexo_captcha_request_token',
+            [self::class, 'request_token'],
+        ); // for guest users
+    }
+
     public static function get_timestamp() {
         return floor(microtime(true) * 1000);
     }
@@ -91,7 +103,11 @@ final class CaptchaService {
         );
     }
 
-    public static function evaluate_data($data) {
+    public static function evaluate_data(?string $data = null) {
+        if (empty($data)) {
+            $data = $_POST['lexo_captcha_data'];
+        }
+
         $data = json_decode(stripslashes($data), true);
 
         $timestamp = self::get_timestamp();
