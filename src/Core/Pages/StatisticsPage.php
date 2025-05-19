@@ -7,7 +7,9 @@ use LEXO\Captcha\Core\Services\CoreService;
 
 final class StatisticsPage extends Page
 {
-    const BASE_SLUG = 'statistics';
+    public static function base_slug() {
+        return 'statistics';
+    }
 
     public static function title() {
         return CoreService::__('LEXO Captcha Statistics');

@@ -156,22 +156,22 @@ final class CoreService
     }
 
     public static function add_plugin_action(string $url, string $title) {
+        ob_start();
+
+        ?>
+
+        <a href="<?= esc_attr($url) ?>">
+            <?= esc_html($title) ?>
+        </a>
+
+        <?php
+
+        $action_link = ob_get_clean();
+
         add_filter(
             'plugin_action_links_' . Core::$basename,
-            function($links) use ($url, $title) {
-                $url = StatisticsPage::url();
-
-                ob_start();
-
-                ?>
-
-                <a href="<?= esc_attr($url) ?>">
-                    <?= esc_html($title) ?>
-                </a>
-
-                <?php
-
-                $links[] = ob_get_clean();
+            function($links) use ($action_link) {
+                $links[] = $action_link;
 
                 return $links;
             },

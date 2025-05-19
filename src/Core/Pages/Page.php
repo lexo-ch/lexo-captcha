@@ -11,29 +11,33 @@ class Page {
         //
     }
 
-    const BASE_SLUG = 'base';
+    public static function base_slug() {
+        return 'base';
+    }
 
-    const BASE_CAPABILITY = Core::BASE_CAPABILITY;
+    public static function base_capability() {
+        return Core::BASE_CAPABILITY;
+    }
 
     public static function filter($name) {
         return CoreService::filter(
-            trailingslashit(self::BASE_SLUG . '-page') . $name,
+            trailingslashit(static::base_slug() . '-page') . $name,
         );
     }
 
     public static function slug() {
-        return CoreService::slug(self::BASE_SLUG);
+        return CoreService::slug(static::base_slug());
     }
 
     public static function parent_slug() {
         return apply_filters(
-            self::filter('parent-slug'),
+            static::filter('parent-slug'),
             'options-general.php',
         );
     }
 
     public static function url() {
-        $path = self::parent_slug();
+        $path = static::parent_slug();
 
         if (strpos($path, '.php') === false) {
             $path = 'admin.php';
@@ -42,7 +46,7 @@ class Page {
         return esc_url(
             add_query_arg(
                 'page',
-                self::slug(),
+                static::slug(),
                 admin_url($path)
             )
         );
@@ -54,19 +58,19 @@ class Page {
 
     public static function capability() {
         return apply_filters(
-            self::filter('capability'),
-            self::BASE_CAPABILITY,
+            static::filter('capability'),
+            static::base_capability(),
         );
     }
 
     public static function add_page() {
         add_submenu_page(
-            self::parent_slug(),
-            self::title(),
-            self::title(),
-            self::capability(),
-            self::slug(),
-            [self::class, 'content'],
+            static::parent_slug(),
+            static::title(),
+            static::title(),
+            static::capability(),
+            static::slug(),
+            [static::class, 'content'],
         );
     }
 
