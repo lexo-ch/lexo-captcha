@@ -33,7 +33,7 @@ final class CaptchaService {
     }
 
     public static function request_token() {
-        if (!CaptchaService::valid_referer()) {
+        if (!self::valid_referer()) {
             if (isset($_SESSION['LEXO_CAPTCHA_TOKEN'])) {
                 unset($_SESSION['LEXO_CAPTCHA_TOKEN']);
             }
@@ -45,7 +45,7 @@ final class CaptchaService {
             exit;
         }
 
-        $_SESSION['LEXO_CAPTCHA_TOKEN_GENERATION_TIMESTAMP'] = CaptchaService::get_timestamp();
+        $_SESSION['LEXO_CAPTCHA_TOKEN_GENERATION_TIMESTAMP'] = self::get_timestamp();
 
         echo $_SESSION['LEXO_CAPTCHA_TOKEN'] = hash('SHA256', $_SESSION['LEXO_CAPTCHA_TOKEN_GENERATION_TIMESTAMP']);
 
@@ -94,7 +94,7 @@ final class CaptchaService {
     public static function evaluate_data($data) {
         $data = json_decode(stripslashes($data), true);
 
-        $timestamp = CaptchaService::get_timestamp();
+        $timestamp = self::get_timestamp();
 
         $evaluations = get_option(
             'lexo_captcha_evaluations',
@@ -106,8 +106,8 @@ final class CaptchaService {
             $evaluations + 1,
         );
 
-        if (!CaptchaService::valid_referer()) {
-            CaptchaService::append_statistics(
+        if (!self::valid_referer()) {
+            self::append_statistics(
                 'Missing or invalid referer host.',
                 $timestamp,
                 $data['interacted'] ?? null,
@@ -123,7 +123,7 @@ final class CaptchaService {
         } 
 
         if (!isset($data['interacted'])) {
-            CaptchaService::append_statistics(
+            self::append_statistics(
                 'Missing interaction data',
                 $timestamp,
                 null,
@@ -136,7 +136,7 @@ final class CaptchaService {
         }
 
         if (!isset($data['token'])) {
-            CaptchaService::append_statistics(
+            self::append_statistics(
                 'Missing token',
                 $timestamp,
                 $data['interacted'],
@@ -149,7 +149,7 @@ final class CaptchaService {
         }
 
         if (empty($_SESSION['LEXO_CAPTCHA_TOKEN']) || !isset($_SESSION['LEXO_CAPTCHA_TOKEN_GENERATION_TIMESTAMP'])) {
-            CaptchaService::append_statistics(
+            self::append_statistics(
                 'No token requested',
                 $timestamp,
                 $data['interacted'],
@@ -168,7 +168,7 @@ final class CaptchaService {
         unset($_SESSION['LEXO_CAPTCHA_TOKEN_GENERATION_TIMESTAMP']);
 
         if ($data['token'] !== $captcha_token) {
-            CaptchaService::append_statistics(
+            self::append_statistics(
                 'Invalid token',
                 $timestamp,
                 $data['interacted'],
@@ -188,7 +188,7 @@ final class CaptchaService {
         );
 
         if ($data['interacted'] > $timestamp + $timestamp_tolerance) {
-            CaptchaService::append_statistics(
+            self::append_statistics(
                 'Interaction data from the future, likely faked',
                 $timestamp,
                 $data['interacted'],
@@ -209,7 +209,7 @@ final class CaptchaService {
         
         // Form sent within 15 seconds since token generation.
         if ($timestamp - $captcha_token_generation_timestamp < $submit_cooldown) {
-            CaptchaService::append_statistics(
+            self::append_statistics(
                 'Submit too early',
                 $timestamp,
                 $data['interacted'],
@@ -234,7 +234,7 @@ final class CaptchaService {
 
         // First interacted over an hour ago.
         if ($timestamp - $data['interacted'] > $max_interaction_age) {
-            CaptchaService::append_statistics(
+            self::append_statistics(
                 'Interaction data too old',
                 $timestamp,
                 $data['interacted'],
@@ -257,7 +257,7 @@ final class CaptchaService {
 
         // Token generated over an hour ago.
         if ($timestamp - $captcha_token_generation_timestamp > $max_token_age) {
-            CaptchaService::append_statistics(
+            self::append_statistics(
                 'Expired token',
                 $timestamp,
                 $data['interacted'],

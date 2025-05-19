@@ -3,7 +3,7 @@
 namespace LEXO\Captcha\Core\Plugin;
 
 use LEXO\Captcha\Core;
-use LEXO\Captcha\Core\Updater\PluginUpdater;
+use LEXO\Captcha\Core\Updater\Updater;
 
 final class PluginService
 {
@@ -19,17 +19,17 @@ final class PluginService
     public static function registerNamespace()
     {
         if (is_user_logged_in()) {
-            PluginService::$can_manage_plugin = current_user_can(Core::BASE_CAPABILITY);
+            self::$can_manage_plugin = current_user_can(Core::BASE_CAPABILITY);
         }
 
         add_action(
-            'admin_post_' . PluginService::$check_update,
-            [PluginService::class, 'checkForUpdateManually'],
+            'admin_post_' . self::$check_update,
+            [self::class, 'checkForUpdateManually'],
         );
 
         add_action(
             'admin_post_toggle_lexo_captcha',
-            [PluginService::class, 'handleToggleCaptchaonverter'],
+            [self::class, 'handleToggleCaptchaonverter'],
         );
     }
 
@@ -49,7 +49,7 @@ final class PluginService
         ];
 
         $vars = apply_filters(
-            PluginService::filter('admin_localized_script'),
+            self::filter('admin_localized_script'),
             $vars,
         );
 
@@ -60,43 +60,17 @@ final class PluginService
         );
     }
 
-    public static function add_statistics_link($links)
-    {
-        $url = StatisticsPage::link();
-
-        $settings_link = "<a href='{$url}'>" . PluginService::__('Statistics') . '</a>';
-
-        array_push(
-            $links,
-            $settings_link
-        );
-
-        return $links;
-    }
-
-    public static function updater()
-    {
-        return (new PluginUpdater())
-            ->setBasename(Core::$basename)
-            ->setSlug(Core::$plugin_slug)
-            ->setVersion(Core::$version)
-            ->setRemotePath(Core::$update_path)
-            ->setCacheKey(Core::$cache_key)
-            ->setCacheExpiration(HOUR_IN_SECONDS)
-            ->setCache(true);
-    }
-
     public static function checkForUpdateManually()
     {
-        if (!wp_verify_nonce($_REQUEST['nonce'], PluginService::$check_update)) {
-            wp_die(PluginService::__('Security check failed.'));
+        if (!wp_verify_nonce($_REQUEST['nonce'], self::$check_update)) {
+            wp_die(self::__('Security check failed.'));
         }
 
-        if (!PluginService::updater()->hasNewUpdate()) {
+        if (!Updater::has_new_update()) {
             set_transient(
                 Core::$domain . '_no_updates_notice',
                 sprintf(
-                    PluginService::__('Plugin %s is up to date.'),
+                    self::__('Plugin %s is up to date.'),
                     Core::$plugin_name
                 ),
                 HOUR_IN_SECONDS,
@@ -176,8 +150,17 @@ final class PluginService
 
         add_filter(
             'plugin_action_links_' . Core::$basename,
-            [PluginService::class, 'add_statistics_link'],
+            [self::class, 'add_statistics_link'],
         );
+    }
+
+    public static function add_statistics_link($links)
+    {
+        $url = StatisticsPage::url();
+
+        $links[] = "<a href='{$url}'>" . self::__('Statistics') . '</a>';
+
+        return $links;
     }
 
     public static function slug($name) {
@@ -189,8 +172,8 @@ final class PluginService
         return esc_url(
             add_query_arg(
                 [
-                    'action' => PluginService::$check_update,
-                    'nonce' => wp_create_nonce(PluginService::$check_update)
+                    'action' => self::$check_update,
+                    'nonce' => wp_create_nonce(self::$check_update)
                 ],
                 admin_url('admin-post.php')
             )
@@ -202,4 +185,4 @@ final class PluginService
     }
 }
 
-PluginService::$check_update = 'check-update-' . Core::$plugin_slug;
+self::$check_update = 'check-update-' . Core::$plugin_slug;

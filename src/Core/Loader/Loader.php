@@ -11,16 +11,16 @@ final class Loader
         //
     }
 
-    public static function add_actions()
+    public static function setup()
     {
         add_action(
             'admin_enqueue_scripts',
-            [Loader::class, 'load_admin_resources'],
+            [self::class, 'load_admin_resources'],
         );
 
         add_action(
             'wp_enqueue_scripts',
-            [Loader::class, 'load_front_resources'],
+            [self::class, 'load_front_resources'],
         );
     }
 

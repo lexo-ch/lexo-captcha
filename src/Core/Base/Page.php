@@ -32,7 +32,7 @@ class Page {
         );
     }
 
-    public static function link() {
+    public static function url() {
         $path = self::parent_slug();
 
         if (strpos($path, '.php') === false) {

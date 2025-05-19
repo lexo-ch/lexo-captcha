@@ -5,6 +5,7 @@ namespace LEXO\Captcha\Core;
 use LEXO\Captcha\Core;
 use LEXO\Captcha\Core\Loader\Loader;
 use LEXO\Captcha\Core\Plugin\PluginService;
+use LEXO\Captcha\Core\Updater\Updater;
 
 final class Bootloader
 {
@@ -17,30 +18,30 @@ final class Bootloader
     {
         add_action(
             'init',
-            [Bootloader::class, 'init'],
+            [self::class, 'init'],
             10,
         );
 
         add_action(
             'after_setup_theme',
-            [Bootloader::class, 'onAfterSetupTheme'],
+            [self::class, 'onAfterSetupTheme'],
         );
 
         add_action(
             'admin_menu',
-            [Bootloader::class, 'onAdminMenu'],
+            [self::class, 'onAdminMenu'],
             100,
         );
 
         add_action(
             'admin_init',
-            [Bootloader::class, 'onAdminInit'],
+            [self::class, 'onAdminInit'],
             10,
         );
 
         add_action(
             'admin_notices',
-            [Bootloader::class, 'onAdminNotices'],
+            [self::class, 'onAdminNotices'],
         );
     }
 
@@ -53,7 +54,7 @@ final class Bootloader
     {
         do_action(Core::$domain . '/init');
 
-        Loader::add_actions();
+        Loader::setup();
 
         PluginService::registerNamespace();
     }
@@ -72,9 +73,9 @@ final class Bootloader
 
     public static function onAfterSetupTheme()
     {
-        Bootloader::loadPluginTextdomain();
+        self::loadPluginTextdomain();
 
-        PluginService::updater()->run();
+        Updater::setup();
     }
 
     public static function loadPluginTextdomain()
