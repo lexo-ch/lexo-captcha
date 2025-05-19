@@ -211,4 +211,14 @@ final class Updater {
 
         return true;
     }
+
+    public static function update_check_url() {
+        return add_query_arg(
+            [
+                'action' => CoreService::$check_update,
+                'nonce' => wp_create_nonce(CoreService::$check_update)
+            ],
+            admin_url('admin-post.php')
+        );
+    }
 }

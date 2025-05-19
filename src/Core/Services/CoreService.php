@@ -25,12 +25,7 @@ final class CoreService
 
         add_action(
             'admin_post_' . self::$check_update,
-            [self::class, 'checkForUpdateManually'],
-        );
-
-        add_action(
-            'admin_post_toggle_lexo_captcha',
-            [self::class, 'handleToggleCaptchaonverter'],
+            [self::class, 'check_for_update'],
         );
     }
 
@@ -61,7 +56,7 @@ final class CoreService
         );
     }
 
-    public static function checkForUpdateManually()
+    public static function check_for_update()
     {
         if (!wp_verify_nonce($_REQUEST['nonce'], self::$check_update)) {
             wp_die(self::__('Security check failed.'));
@@ -72,7 +67,7 @@ final class CoreService
                 Core::$domain . '_no_updates_notice',
                 sprintf(
                     self::__('Plugin %s is up to date.'),
-                    Core::$plugin_name
+                    Core::$plugin_name,
                 ),
                 HOUR_IN_SECONDS,
             );
@@ -117,9 +112,9 @@ final class CoreService
                 'dismissible' => true,
                 'attributes'  => [
                     'data-slug'   => Core::$plugin_slug,
-                    'data-action' => 'no-updates'
-                ]
-            ]
+                    'data-action' => 'no-updates',
+                ],
+            ],
         );
     }
 
@@ -140,28 +135,47 @@ final class CoreService
                 'dismissible' => true,
                 'attributes'  => [
                     'data-slug'   => Core::$plugin_slug,
-                    'data-action' => 'updated'
-                ]
-            ]
+                    'data-action' => 'updated',
+                ],
+            ],
         );
     }
 
     public static function add_pages() {
         StatisticsPage::add_page();
 
-        add_filter(
-            'plugin_action_links_' . Core::$basename,
-            [self::class, 'add_statistics_link'],
+        self::add_plugin_action(
+            Updater::update_check_url(),
+            self::__('Update Check'),
+        );
+
+        self::add_plugin_action(
+            StatisticsPage::url(),
+            self::__('Statistics'),
         );
     }
 
-    public static function add_statistics_link($links)
-    {
-        $url = StatisticsPage::url();
+    public static function add_plugin_action(string $url, string $title) {
+        add_filter(
+            'plugin_action_links_' . Core::$basename,
+            function($links) use ($url, $title) {
+                $url = StatisticsPage::url();
 
-        $links[] = "<a href='{$url}'>" . self::__('Statistics') . '</a>';
+                ob_start();
 
-        return $links;
+                ?>
+
+                <a href="<?= esc_attr($url) ?>">
+                    <?= esc_html($title) ?>
+                </a>
+
+                <?php
+
+                $links[] = ob_get_clean();
+
+                return $links;
+            },
+        );
     }
 
     public static function slug($name) {
