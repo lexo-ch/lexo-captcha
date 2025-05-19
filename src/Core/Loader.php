@@ -1,6 +1,6 @@
 <?php
 
-namespace LEXO\Captcha\Core\Loader;
+namespace LEXO\Captcha\Core;
 
 use LEXO\Captcha\Core;
 

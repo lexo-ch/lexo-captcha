@@ -3,9 +3,9 @@
 namespace LEXO\Captcha\Core;
 
 use LEXO\Captcha\Core;
-use LEXO\Captcha\Core\Loader\Loader;
+use LEXO\Captcha\Core\Loader;
 use LEXO\Captcha\Core\Plugin\PluginService;
-use LEXO\Captcha\Core\Updater\Updater;
+use LEXO\Captcha\Core\Updater;
 
 final class Bootloader
 {

@@ -3,7 +3,7 @@
 namespace LEXO\Captcha\Core\Plugin;
 
 use LEXO\Captcha\Core;
-use LEXO\Captcha\Core\Updater\Updater;
+use LEXO\Captcha\Core\Updater;
 
 final class PluginService
 {
@@ -185,4 +185,4 @@ final class PluginService
     }
 }
 
-self::$check_update = 'check-update-' . Core::$plugin_slug;
+PluginService::$check_update = 'check-update-' . Core::$plugin_slug;

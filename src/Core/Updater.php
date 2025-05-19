@@ -1,6 +1,6 @@
 <?php
 
-namespace LEXO\Captcha\Core\Updater;
+namespace LEXO\Captcha\Core;
 
 use LEXO\Captcha\Core;
 use LEXO\Captcha\Core\Plugin\PluginService;
