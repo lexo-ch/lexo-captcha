@@ -13,20 +13,16 @@ final class CoreService
         //
     }
 
-    public static string $check_update;
-
-    public static bool $can_manage_plugin = false;
-
-    public static function registerNamespace()
-    {
-        if (is_user_logged_in()) {
-            self::$can_manage_plugin = current_user_can(Core::BASE_CAPABILITY);
+    public static function can_manage_plugin() {
+        if (!is_user_logged_in()) {
+            return false;
         }
 
-        add_action(
-            'admin_post_' . self::$check_update,
-            [self::class, 'check_for_update'],
-        );
+        return current_user_can(Core::BASE_CAPABILITY);
+    }
+
+    public static function action($name) {
+        return trailingslashit(Core::$domain) . $name;
     }
 
     public static function filter($name) {
@@ -53,91 +49,6 @@ final class CoreService
             trailingslashit(Core::$domain) . 'admin-' . Core::$domain . '.js',
             Core::$domain . 'AdminLocalized',
             $vars,
-        );
-    }
-
-    public static function check_for_update()
-    {
-        if (!wp_verify_nonce($_REQUEST['nonce'], self::$check_update)) {
-            wp_die(self::__('Security check failed.'));
-        }
-
-        if (!Updater::has_new_update()) {
-            set_transient(
-                Core::$domain . '_no_updates_notice',
-                sprintf(
-                    self::__('Plugin %s is up to date.'),
-                    Core::$plugin_name,
-                ),
-                HOUR_IN_SECONDS,
-            );
-        }
-        else {
-            delete_transient(Core::$cache_key);
-            
-            wp_safe_redirect(admin_url('plugins.php'));
-        }
-
-        exit;
-    }
-
-    public static function nextAutoUpdateCheck()
-    {
-        $expiration_datetime = get_option('_transient_timeout_' . Core::$cache_key);
-
-        if (!$expiration_datetime) {
-            return false;
-        }
-
-        return wp_date(
-            get_option('date_format') . ' ' . get_option('time_format'),
-            $expiration_datetime,
-        );
-    }
-
-    public static function noUpdatesNotice()
-    {
-        $message = get_transient(Core::$domain . '_no_updates_notice');
-
-        delete_transient(Core::$domain . '_no_updates_notice');
-
-        if (!$message) {
-            return false;
-        }
-
-        wp_admin_notice(
-            $message,
-            [
-                'type'        => 'success',
-                'dismissible' => true,
-                'attributes'  => [
-                    'data-slug'   => Core::$plugin_slug,
-                    'data-action' => 'no-updates',
-                ],
-            ],
-        );
-    }
-
-    public static function updateSuccessNotice()
-    {
-        $message = get_transient(Core::$domain . '_update_success_notice');
-
-        delete_transient(Core::$domain . '_update_success_notice');
-
-        if (!$message) {
-            return false;
-        }
-
-        wp_admin_notice(
-            $message,
-            [
-                'type'        => 'success',
-                'dismissible' => true,
-                'attributes'  => [
-                    'data-slug'   => Core::$plugin_slug,
-                    'data-action' => 'updated',
-                ],
-            ],
         );
     }
 
@@ -182,22 +93,7 @@ final class CoreService
         return Core::$plugin_slug . "-{$name}";
     }
 
-    public static function getManualUpdateCheckLink(): string
-    {
-        return esc_url(
-            add_query_arg(
-                [
-                    'action' => self::$check_update,
-                    'nonce' => wp_create_nonce(self::$check_update)
-                ],
-                admin_url('admin-post.php')
-            )
-        );
-    }
-
     public static function __($text) {
         return __($text, Core::$domain);
     }
 }
-
-CoreService::$check_update = 'check-update-' . Core::$plugin_slug;

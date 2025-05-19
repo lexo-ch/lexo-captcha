@@ -24,66 +24,59 @@ final class Bootloader
 
         add_action(
             'after_setup_theme',
-            [self::class, 'onAfterSetupTheme'],
+            [self::class, 'after_setup_theme'],
         );
 
         add_action(
             'admin_menu',
-            [self::class, 'onAdminMenu'],
+            [self::class, 'admin_menu'],
             100,
         );
 
         add_action(
             'admin_init',
-            [self::class, 'onAdminInit'],
+            [self::class, 'admin_init'],
             10,
         );
 
         add_action(
             'admin_notices',
-            [self::class, 'onAdminNotices'],
+            [self::class, 'admin_notices'],
         );
     }
 
-    public static function onAdminInit()
+    public static function admin_init()
     {
         //
     }
 
     public static function init()
     {
-        do_action(Core::$domain . '/init');
+        do_action(CoreService::action('init'));
 
         Loader::setup();
-
-        CoreService::registerNamespace();
     }
 
-    public static function onAdminMenu()
+    public static function admin_menu()
     {
         CoreService::add_pages();
     }
 
-    public static function onAdminNotices()
+    public static function admin_notices()
     {
-        CoreService::noUpdatesNotice();
+        Updater::no_updates_notice();
 
-        CoreService::updateSuccessNotice();
+        Updater::update_success_notice();
     }
 
-    public static function onAfterSetupTheme()
-    {
-        self::loadPluginTextdomain();
-
-        Updater::setup();
-    }
-
-    public static function loadPluginTextdomain()
+    public static function after_setup_theme()
     {
         load_plugin_textdomain(
             Core::$domain,
             false,
             trailingslashit(trailingslashit(basename(Core::$path)) . Core::$locales),
         );
+
+        Updater::setup();
     }
 }

@@ -9,7 +9,16 @@ use LEXO\Captcha\Core\Services\CoreService;
 final class Updater {
     const CACHE = true;
 
+    public static string $check_update_action;
+
     public static function setup(): void {
+        self::$check_update_action = 'check-update-' . Core::$plugin_slug;
+
+        add_action(
+            'admin_post_' . self::$check_update_action,
+            [self::class, 'check_for_update'],
+        );
+
         add_filter(
             'plugins_api',
             [self::class, 'info'],
@@ -184,7 +193,7 @@ final class Updater {
         delete_transient(Core::$cache_key);
     }
 
-    public static function has_new_update() {
+    public static function has_update() {
         $remote = self::get_remote_data();
 
         if (empty($remote)) {
@@ -215,10 +224,92 @@ final class Updater {
     public static function update_check_url() {
         return add_query_arg(
             [
-                'action' => CoreService::$check_update,
-                'nonce' => wp_create_nonce(CoreService::$check_update)
+                'action' => self::$check_update_action,
+                'nonce' => wp_create_nonce(self::$check_update_action)
             ],
             admin_url('admin-post.php')
+        );
+    }
+
+    public static function check_for_update()
+    {
+        if (!wp_verify_nonce($_REQUEST['nonce'], self::$check_update_action)) {
+            wp_die(CoreService::__('Security check failed.'));
+        }
+
+        if (!self::has_update()) {
+            set_transient(
+                Core::$domain . '_no_updates_notice',
+                sprintf(
+                    CoreService::__('Plugin %s is up to date.'),
+                    Core::$plugin_name,
+                ),
+                HOUR_IN_SECONDS,
+            );
+        }
+        else {
+            delete_transient(Core::$cache_key);
+        }
+
+        if (wp_safe_redirect(admin_url('plugins.php'))) {
+            exit;
+        }
+    }
+
+    public static function next_update_check() {
+        $expiration_datetime = get_option('_transient_timeout_' . Core::$cache_key);
+
+        if (!$expiration_datetime) {
+            return false;
+        }
+
+        return wp_date(
+            get_option('date_format') . ' ' . get_option('time_format'),
+            $expiration_datetime,
+        );
+    }
+
+    public static function no_updates_notice() {
+        $message = get_transient(Core::$domain . '_no_updates_notice');
+
+        delete_transient(Core::$domain . '_no_updates_notice');
+
+        if (empty($message)) {
+            return false;
+        }
+
+        wp_admin_notice(
+            $message,
+            [
+                'type'        => 'success',
+                'dismissible' => true,
+                'attributes'  => [
+                    'data-slug'   => Core::$plugin_slug,
+                    'data-action' => 'no-updates',
+                ],
+            ],
+        );
+    }
+
+    public static function update_success_notice() {
+        $message = get_transient(Core::$domain . '_update_success_notice');
+
+        delete_transient(Core::$domain . '_update_success_notice');
+
+        if (empty($message)) {
+            return false;
+        }
+
+        wp_admin_notice(
+            $message,
+            [
+                'type'        => 'success',
+                'dismissible' => true,
+                'attributes'  => [
+                    'data-slug'   => Core::$plugin_slug,
+                    'data-action' => 'updated',
+                ],
+            ],
         );
     }
 }
