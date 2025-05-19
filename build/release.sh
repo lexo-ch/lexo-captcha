@@ -21,7 +21,7 @@ rm -rf info.jsone
 sed -ie "s/$CURRENT_VERSION.zip/$NEXT_VERSION.zip/g" info.json
 rm -rf info.jsone
 
-npx mix --production
+npm run build
 sudo composer dump-autoload -oa
 
 mkdir lexo-captcha

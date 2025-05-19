@@ -110,7 +110,7 @@ try {
 
         wp_die(
             trim(ob_get_clean()),
-            'lexocaptcha',
+            Core::$domain,
         );
     }
 
