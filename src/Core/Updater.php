@@ -2,9 +2,9 @@
 
 namespace LEXO\Captcha\Core;
 
-use LEXO\Captcha\Core;
-use LEXO\Captcha\Core\Plugin\PluginService;
 use stdClass;
+use LEXO\Captcha\Core;
+use LEXO\Captcha\Core\Services\CoreService;
 
 final class Updater {
     const CACHE = true;
@@ -94,7 +94,7 @@ final class Updater {
         ];
 
         $sections = apply_filters(
-            PluginService::filter('plugin_sections'),
+            CoreService::filter('plugin_sections'),
             $sections,
         );
 

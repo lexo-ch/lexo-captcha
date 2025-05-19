@@ -4,8 +4,8 @@ namespace LEXO\Captcha\Core;
 
 use LEXO\Captcha\Core;
 use LEXO\Captcha\Core\Loader;
-use LEXO\Captcha\Core\Plugin\PluginService;
 use LEXO\Captcha\Core\Updater;
+use LEXO\Captcha\Core\Services\CoreService;
 
 final class Bootloader
 {
@@ -56,19 +56,19 @@ final class Bootloader
 
         Loader::setup();
 
-        PluginService::registerNamespace();
+        CoreService::registerNamespace();
     }
 
     public static function onAdminMenu()
     {
-        PluginService::add_pages();
+        CoreService::add_pages();
     }
 
     public static function onAdminNotices()
     {
-        PluginService::noUpdatesNotice();
+        CoreService::noUpdatesNotice();
 
-        PluginService::updateSuccessNotice();
+        CoreService::updateSuccessNotice();
     }
 
     public static function onAfterSetupTheme()

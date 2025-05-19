@@ -1,9 +1,9 @@
 <?php
 
-namespace LEXO\Captcha\Core\Base;
+namespace LEXO\Captcha\Core\Pages;
 
 use LEXO\Captcha\Core;
-use LEXO\Captcha\Core\Plugin\PluginService;
+use LEXO\Captcha\Core\Services\CoreService;
 
 class Page {
     private function __construct()
@@ -16,13 +16,13 @@ class Page {
     const BASE_CAPABILITY = Core::BASE_CAPABILITY;
 
     public static function filter($name) {
-        return PluginService::filter(
+        return CoreService::filter(
             trailingslashit(self::BASE_SLUG . '-page') . $name,
         );
     }
 
     public static function slug() {
-        return PluginService::slug(self::BASE_SLUG);
+        return CoreService::slug(self::BASE_SLUG);
     }
 
     public static function parent_slug() {
@@ -49,7 +49,7 @@ class Page {
     }
 
     public static function title() {
-        return PluginService::__('Page Title');
+        return CoreService::__('Page Title');
     }
 
     public static function capability() {

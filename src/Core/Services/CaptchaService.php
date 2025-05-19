@@ -1,6 +1,6 @@
 <?php
 
-namespace LEXO\Captcha\Core\Plugin;
+namespace LEXO\Captcha\Core\Services;
 
 final class CaptchaService {
     private function __construct()
@@ -183,7 +183,7 @@ final class CaptchaService {
         // client timestamp tolerance = 300000ms = 300s
 
         $timestamp_tolerance = apply_filters(
-            PluginService::filter('client-timestamp-tolerance'),
+            CoreService::filter('client-timestamp-tolerance'),
             300000,
         );
 
@@ -203,7 +203,7 @@ final class CaptchaService {
         // 15000ms = 15s
 
         $submit_cooldown = apply_filters(
-            PluginService::filter('submit-cooldown'),
+            CoreService::filter('submit-cooldown'),
             15000,
         );
         
@@ -228,7 +228,7 @@ final class CaptchaService {
         // 3600000ms = 1h
 
         $max_interaction_age = apply_filters(
-            PluginService::filter('max-interaction-age'),
+            CoreService::filter('max-interaction-age'),
             3600000,
         );
 
@@ -251,7 +251,7 @@ final class CaptchaService {
         }
 
         $max_token_age = apply_filters(
-            PluginService::filter('max-token-age'),
+            CoreService::filter('max-token-age'),
             3600000,
         );
 

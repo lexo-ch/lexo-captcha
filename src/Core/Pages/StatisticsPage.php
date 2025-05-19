@@ -1,15 +1,16 @@
 <?php
 
-namespace LEXO\Captcha\Core\Plugin;
+namespace LEXO\Captcha\Core\Pages;
 
-use LEXO\Captcha\Core\Base\Page;
+use LEXO\Captcha\Core\Pages\Page;
+use LEXO\Captcha\Core\Services\CoreService;
 
 final class StatisticsPage extends Page
 {
     const BASE_SLUG = 'statistics';
 
     public static function title() {
-        return PluginService::__('LEXO Captcha Statistics');
+        return CoreService::__('LEXO Captcha Statistics');
     }
 
     public static function content() {

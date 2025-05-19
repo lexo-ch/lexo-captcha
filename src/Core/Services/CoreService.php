@@ -1,11 +1,12 @@
 <?php
 
-namespace LEXO\Captcha\Core\Plugin;
+namespace LEXO\Captcha\Core\Services;
 
 use LEXO\Captcha\Core;
 use LEXO\Captcha\Core\Updater;
+use LEXO\Captcha\Core\Pages\StatisticsPage;
 
-final class PluginService
+final class CoreService
 {
     private function __construct()
     {
@@ -185,4 +186,4 @@ final class PluginService
     }
 }
 
-PluginService::$check_update = 'check-update-' . Core::$plugin_slug;
+CoreService::$check_update = 'check-update-' . Core::$plugin_slug;
