@@ -34,12 +34,12 @@ final class CoreService
 
         self::add_plugin_action(
             Updater::update_check_url(),
-            self::__('Update Check'),
+            __('Update Check', 'lexocaptcha'),
         );
 
         self::add_plugin_action(
             StatisticsPage::url(),
-            self::__('Statistics'),
+            __('Statistics', 'lexocaptcha'),
         );
     }
 
@@ -68,9 +68,5 @@ final class CoreService
 
     public static function slug($name) {
         return Core::$plugin_slug . "-{$name}";
-    }
-
-    public static function __($text) {
-        return __($text, Core::$domain);
     }
 }

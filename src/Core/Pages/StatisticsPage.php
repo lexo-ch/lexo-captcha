@@ -3,6 +3,7 @@
 namespace LEXO\Captcha\Core\Pages;
 
 use LEXO\Captcha\Core\Pages\Page;
+use LEXO\Captcha\Core\Services\CaptchaService;
 use LEXO\Captcha\Core\Services\CoreService;
 
 final class StatisticsPage extends Page
@@ -12,7 +13,7 @@ final class StatisticsPage extends Page
     }
 
     public static function title() {
-        return CoreService::__('LEXO Captcha Statistics');
+        return __('LEXO Captcha Statistics', 'lexocaptcha');
     }
 
     public static function content() {
@@ -33,11 +34,11 @@ final class StatisticsPage extends Page
 
         <div class="wrap">
             <h1>
-                Captcha Statistics
+                <?= esc_html(__('Captcha Statistics', 'lexocaptcha')) ?>
             </h1>
             
             <p>
-                Caught Spam:
+                <?= esc_html(__('Caught Spam:', 'lexocaptcha')) ?>
                 
                 <b>
                     <?= esc_html($caught_spam) ?>
@@ -45,7 +46,7 @@ final class StatisticsPage extends Page
             </p>
 
             <p>
-                Total Evaluations:
+                <?= esc_html(__('Total Evaluations:', 'lexocaptcha')) ?>
                 
                 <b>
                     <?= esc_html($total_evaluations) ?>
@@ -58,7 +59,7 @@ final class StatisticsPage extends Page
                 ?>
 
                 <p>
-                    Spam Quota:
+                    <?= esc_html(__('Spam Quota:', 'lexocaptcha')) ?>
                     
                     <b>
                         <?= esc_html(($caught_spam / $total_evaluations) * 100) ?>%
@@ -72,7 +73,7 @@ final class StatisticsPage extends Page
                 ?>
 
                 <h1>
-                    Spam Log
+                    <?= esc_html(__('Spam Log', 'lexocaptcha')) ?>
                 </h1>
 
                 <?php
@@ -91,15 +92,15 @@ final class StatisticsPage extends Page
                     </h2>
 
                     <p>
-                        Reason:
+                        <?= esc_html(__('Reason:', 'lexocaptcha')) ?>
                         
                         <b>
-                            <?= esc_html($statistic_entry->reason) ?>
+                            <?= esc_html(CaptchaService::describe_reason($statistic_entry->reason)) ?>
                         </b>
                     </p>
                     
                     <p>
-                        Evaluation Timestamp:
+                        <?= esc_html(__('Evaluation Timestamp:', 'lexocaptcha')) ?>
                         
                         <b>
                             <?= esc_html($statistic_entry->timestamp) ?>
@@ -107,7 +108,7 @@ final class StatisticsPage extends Page
                     </p>
                     
                     <p>
-                        User-Agent:
+                        <?= esc_html(__('User-Agent:', 'lexocaptcha')) ?>
                         
                         <b>
                             <?= esc_html($statistic_entry->user_agent ?? '-') ?>
@@ -115,7 +116,7 @@ final class StatisticsPage extends Page
                     </p>
                     
                     <p>
-                        Referer:
+                        <?= esc_html(__('Referer:', 'lexocaptcha')) ?>
                         
                         <b>
                             <?= esc_html($statistic_entry->referer ?? '-') ?>
@@ -123,7 +124,7 @@ final class StatisticsPage extends Page
                     </p>
                     
                     <p>
-                        First Client Interaction Timestamp:
+                        <?= esc_html(__('First Client Interaction Timestamp:', 'lexocaptcha')) ?>
                         
                         <b>
                             <?= esc_html($statistic_entry->interaction_timestamp ?? '-') ?>
@@ -131,7 +132,7 @@ final class StatisticsPage extends Page
                     </p>
                     
                     <p>
-                        Token Given by Client:
+                        <?= esc_html(__('Token Given by Client:', 'lexocaptcha')) ?>
                         
                         <b>
                             <?= esc_html($statistic_entry->given_token ?? '-') ?>
@@ -139,7 +140,7 @@ final class StatisticsPage extends Page
                     </p>
                     
                     <p>
-                        Expected Token:
+                        <?= esc_html(__('Expected Token:', 'lexocaptcha')) ?>
                         
                         <b>
                             <?= esc_html($statistic_entry->expected_token ?? '-') ?>
@@ -147,7 +148,7 @@ final class StatisticsPage extends Page
                     </p>
                     
                     <p>
-                        Token Generation Timestamp:
+                        <?= esc_html(__('Token Generation Timestamp:', 'lexocaptcha')) ?>
                         
                         <b>
                             <?= esc_html($statistic_entry->token_generation_timestamp ?? '-') ?>
@@ -160,7 +161,7 @@ final class StatisticsPage extends Page
                         ?>
 
                         <h3>
-                            Additional Data
+                            <?= esc_html(__('Additional Data', 'lexocaptcha')) ?>
                         </h3>
 
                         <?php

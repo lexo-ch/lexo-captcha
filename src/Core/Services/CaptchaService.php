@@ -124,7 +124,7 @@ final class CaptchaService {
 
         if (!self::valid_referer()) {
             self::append_statistics(
-                'Missing or invalid referer host.',
+                'invalid-referer-host',
                 $timestamp,
                 $data['interacted'] ?? null,
                 $data['token'] ?? null,
@@ -140,7 +140,7 @@ final class CaptchaService {
 
         if (!isset($data['interacted'])) {
             self::append_statistics(
-                'Missing interaction data',
+                'interaction-data-missing',
                 $timestamp,
                 null,
                 $data['token'] ?? null,
@@ -153,7 +153,7 @@ final class CaptchaService {
 
         if (!isset($data['token'])) {
             self::append_statistics(
-                'Missing token',
+                'token-missing',
                 $timestamp,
                 $data['interacted'],
                 null,
@@ -166,7 +166,7 @@ final class CaptchaService {
 
         if (empty($_SESSION['LEXO_CAPTCHA_TOKEN']) || !isset($_SESSION['LEXO_CAPTCHA_TOKEN_GENERATION_TIMESTAMP'])) {
             self::append_statistics(
-                'No token requested',
+                'no-token-requested',
                 $timestamp,
                 $data['interacted'],
                 $data['token'],
@@ -185,7 +185,7 @@ final class CaptchaService {
 
         if ($data['token'] !== $captcha_token) {
             self::append_statistics(
-                'Invalid token',
+                'invalid-token',
                 $timestamp,
                 $data['interacted'],
                 $data['token'],
@@ -205,7 +205,7 @@ final class CaptchaService {
 
         if ($data['interacted'] > $timestamp + $timestamp_tolerance) {
             self::append_statistics(
-                'Interaction data from the future, likely faked',
+                'interaction-data-future',
                 $timestamp,
                 $data['interacted'],
                 $data['token'],
@@ -226,7 +226,7 @@ final class CaptchaService {
         // Form sent within 15 seconds since token generation.
         if ($timestamp - $captcha_token_generation_timestamp < $submit_cooldown) {
             self::append_statistics(
-                'Submit too early',
+                'early-submit',
                 $timestamp,
                 $data['interacted'],
                 $data['token'],
@@ -251,7 +251,7 @@ final class CaptchaService {
         // First interacted over an hour ago.
         if ($timestamp - $data['interacted'] > $max_interaction_age) {
             self::append_statistics(
-                'Interaction data too old',
+                'interaction-data-expired',
                 $timestamp,
                 $data['interacted'],
                 $data['token'],
@@ -274,7 +274,7 @@ final class CaptchaService {
         // Token generated over an hour ago.
         if ($timestamp - $captcha_token_generation_timestamp > $max_token_age) {
             self::append_statistics(
-                'Expired token',
+                'expired-token',
                 $timestamp,
                 $data['interacted'],
                 $data['token'],
@@ -290,5 +290,30 @@ final class CaptchaService {
         }
 
         return true;
+    }
+
+    public static function describe_reason($reason) {
+        switch ($reason) {
+            case 'expired-token':
+                return __('Expired token.', 'lexocaptcha');
+            case 'interaction-data-expired':
+                return __('Interaction data expired.', 'lexocaptcha');
+            case 'early-submit':
+                return __('Submitted too early.', 'lexocaptcha');
+            case 'interaction-data-future':
+                return __('Interaction data from the future, likely faked.', 'lexocaptcha');
+            case 'invalid-token':
+                return __('Invalid token.', 'lexocaptcha');
+            case 'no-token-requested':
+                return __('No token requested.', 'lexocaptcha');
+            case 'token-missing':
+                return __('Token missing.', 'lexocaptcha');
+            case 'interaction-data-missing':
+                return __('Interaction data missing.', 'lexocaptcha');
+            case 'invalid-referer-host':
+                return __('Missing referer or invalid referer host.', 'lexocaptcha');
+        }
+
+        return $reason;
     }
 }

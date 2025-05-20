@@ -1,0 +1,141 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: LEXO Captcha\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-05-20 07:53+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: \n"
+"Language: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.7.2; wp-6.8.1\n"
+"X-Domain: lexocaptcha"
+
+#: src/Core/Pages/StatisticsPage.php:164
+msgid "Additional Data"
+msgstr ""
+
+#: src/Core/Pages/StatisticsPage.php:37
+msgid "Captcha Statistics"
+msgstr ""
+
+#: src/Core/Pages/StatisticsPage.php:41
+msgid "Caught Spam:"
+msgstr ""
+
+#: src/Core/Pages/StatisticsPage.php:103
+msgid "Evaluation Timestamp:"
+msgstr ""
+
+#: src/Core/Pages/StatisticsPage.php:143
+msgid "Expected Token:"
+msgstr ""
+
+#: src/Core/Services/CaptchaService.php:298
+msgid "Expired token."
+msgstr ""
+
+#: src/Core/Pages/StatisticsPage.php:127
+msgid "First Client Interaction Timestamp:"
+msgstr ""
+
+#. URI of the plugin
+msgid "https://github.com/lexo-ch/lexo-captcha/"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://www.lexo.ch"
+msgstr ""
+
+#: src/Core/Services/CaptchaService.php:300
+msgid "Interaction data expired."
+msgstr ""
+
+#: src/Core/Services/CaptchaService.php:304
+msgid "Interaction data from the future, likely faked."
+msgstr ""
+
+#: src/Core/Services/CaptchaService.php:312
+msgid "Interaction data missing."
+msgstr ""
+
+#: src/Core/Services/CaptchaService.php:306
+msgid "Invalid token."
+msgstr ""
+
+#. Name of the plugin
+msgid "LEXO Captcha"
+msgstr ""
+
+#. Description of the plugin
+msgid "LEXO Captcha solution."
+msgstr ""
+
+#: src/Core/Pages/StatisticsPage.php:16
+msgid "LEXO Captcha Statistics"
+msgstr ""
+
+#. Author of the plugin
+msgid "LEXO GmbH"
+msgstr ""
+
+#: src/Core/Services/CaptchaService.php:314
+msgid "Missing referer or invalid referer host."
+msgstr ""
+
+#: src/Core/Services/CaptchaService.php:308
+msgid "No token requested."
+msgstr ""
+
+#: src/Core/Pages/StatisticsPage.php:95
+msgid "Reason:"
+msgstr ""
+
+#: src/Core/Pages/StatisticsPage.php:119
+msgid "Referer:"
+msgstr ""
+
+#: src/Core/Pages/StatisticsPage.php:76
+msgid "Spam Log"
+msgstr ""
+
+#: src/Core/Pages/StatisticsPage.php:62
+msgid "Spam Quota:"
+msgstr ""
+
+#: src/Core/Services/CoreService.php:42
+msgid "Statistics"
+msgstr ""
+
+#: src/Core/Services/CaptchaService.php:302
+msgid "Submitted too early."
+msgstr ""
+
+#: src/Core/Pages/StatisticsPage.php:151
+msgid "Token Generation Timestamp:"
+msgstr ""
+
+#: src/Core/Pages/StatisticsPage.php:135
+msgid "Token Given by Client:"
+msgstr ""
+
+#: src/Core/Services/CaptchaService.php:310
+msgid "Token missing."
+msgstr ""
+
+#: src/Core/Pages/StatisticsPage.php:49
+msgid "Total Evaluations:"
+msgstr ""
+
+#: src/Core/Services/CoreService.php:37
+msgid "Update Check"
+msgstr ""
+
+#: src/Core/Pages/StatisticsPage.php:111
+msgid "User-Agent:"
+msgstr ""
