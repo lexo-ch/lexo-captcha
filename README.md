@@ -24,27 +24,27 @@ Requesting a token in the frontend can be done using the `LEXO_Captcha.requestTo
 
 ---
 ## Filters
-### Core
-For convenience, you may use `LEXO\Captcha\Core\Services\CoreService::filter($name)` to get the proper names to these filters.
+### Captcha
+For convenience, you may use `LEXO\Captcha\Core\Services\CaptchaService::filter($name)` to get the proper names to these filters.
 
 #### - `client-timestamp-tolerance`
 *Parameters*
-`apply_filters('lexocaptcha/client-timestamp-tolerance', $tolerance);`
+`apply_filters('lexocaptcha/captcha/client-timestamp-tolerance', $tolerance);`
 - `$tolerance` (`int`) The amount of time in ms client-supplied timestamps may be off from server time.
 
 #### - `submit-cooldown`
 *Parameters*
-`apply_filters('lexocaptcha/submit-cooldown', $cooldown);`
+`apply_filters('lexocaptcha/captcha/submit-cooldown', $cooldown);`
 - `$cooldown` (`int`) The amount of time in ms that a client must wait after requesting a token before being allowed to use it.
 
 #### - `max-interaction-age`
 *Parameters*
-`apply_filters('lexocaptcha/max-interaction-age', $max_age);`
+`apply_filters('lexocaptcha/captcha/max-interaction-age', $max_age);`
 - `$max_age` (`int`) The amount of time in ms before the client-supplied interaction data expires.
 
 #### - `max-token-age`
 *Parameters*
-`apply_filters('lexocaptcha/max-token-age', $max_age);`
+`apply_filters('lexocaptcha/captcha/max-token-age', $max_age);`
 - `$max_age` (`int`) The amount of time in ms before the requested token expires.
 
 ---

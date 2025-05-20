@@ -10,6 +10,12 @@ final class CaptchaService {
         //
     }
 
+    public static function filter(string $name) {
+        return self::filter(
+            "captcha/{$name}",
+        );
+    }
+
     private static function valid_referer() {
         if (empty($_SERVER['SERVER_NAME'])) {
             return false;
@@ -71,7 +77,7 @@ final class CaptchaService {
             Loader::filter('front-script-globals'),
             function($globals) {
                 $globals['submit_cooldown'] = apply_filters(
-                    CoreService::filter('submit-cooldown'),
+                    self::filter('submit-cooldown'),
                     self::DEFAULT_SUBMIT_COOLDOWN,
                 );
 
@@ -217,7 +223,7 @@ final class CaptchaService {
         // client timestamp tolerance = 300000ms = 300s
 
         $timestamp_tolerance = apply_filters(
-            CoreService::filter('client-timestamp-tolerance'),
+            self::filter('client-timestamp-tolerance'),
             300000,
         );
 
@@ -237,7 +243,7 @@ final class CaptchaService {
         // 15000ms = 15s
 
         $submit_cooldown = apply_filters(
-            CoreService::filter('submit-cooldown'),
+            self::filter('submit-cooldown'),
             self::DEFAULT_SUBMIT_COOLDOWN,
         );
         
@@ -262,7 +268,7 @@ final class CaptchaService {
         // 3600000ms = 1h
 
         $max_interaction_age = apply_filters(
-            CoreService::filter('max-interaction-age'),
+            self::filter('max-interaction-age'),
             3600000,
         );
 
@@ -285,7 +291,7 @@ final class CaptchaService {
         }
 
         $max_token_age = apply_filters(
-            CoreService::filter('max-token-age'),
+            self::filter('max-token-age'),
             3600000,
         );
 
