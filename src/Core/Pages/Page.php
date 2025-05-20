@@ -53,7 +53,7 @@ class Page {
     }
 
     public static function title() {
-        return CoreService::__('Page Title');
+        return __('Page Title', 'lexocaptcha');
     }
 
     public static function capability() {

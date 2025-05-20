@@ -234,14 +234,14 @@ final class Updater {
     public static function check_for_update()
     {
         if (!wp_verify_nonce($_REQUEST['nonce'], self::$check_update_action)) {
-            wp_die(CoreService::__('Security check failed.'));
+            wp_die(__('Security check failed.', 'lexocaptcha'));
         }
 
         if (!self::has_update()) {
             set_transient(
                 Core::$domain . '_no_updates_notice',
                 sprintf(
-                    CoreService::__('Plugin %s is up to date.'),
+                    __('Plugin %s is up to date.', 'lexocaptcha'),
                     Core::$plugin_name,
                 ),
                 HOUR_IN_SECONDS,

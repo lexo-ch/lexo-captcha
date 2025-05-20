@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: LEXO Captcha\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-05-20 07:32+0000\n"
-"PO-Revision-Date: 2025-05-20 07:56+0000\n"
+"PO-Revision-Date: 2025-05-20 08:33+0000\n"
 "Last-Translator: \n"
 "Language-Team: Deutsch\n"
 "Language: de_DE\n"
@@ -91,6 +91,15 @@ msgstr "Fehlender Referer oder ungültiger Referer-Host."
 msgid "No token requested."
 msgstr "Kein Token angefordert."
 
+#: src/Core/Pages/Page.php:56
+msgid "Page Title"
+msgstr "Seiten-Titel"
+
+#: src/Core/Updater.php:244
+#, php-format
+msgid "Plugin %s is up to date."
+msgstr "Plugin %s ist aktuell."
+
 #: src/Core/Pages/StatisticsPage.php:95
 msgid "Reason:"
 msgstr "Grund:"
@@ -98,6 +107,10 @@ msgstr "Grund:"
 #: src/Core/Pages/StatisticsPage.php:119
 msgid "Referer:"
 msgstr "Referer:"
+
+#: src/Core/Updater.php:237
+msgid "Security check failed."
+msgstr "Sicherheits-Prüfung gescheitert."
 
 #: src/Core/Pages/StatisticsPage.php:76
 msgid "Spam Log"

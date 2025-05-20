@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: LEXO Captcha\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-20 07:53+0000\n"
+"POT-Creation-Date: 2025-05-20 08:31+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -92,12 +92,25 @@ msgstr ""
 msgid "No token requested."
 msgstr ""
 
+#: src/Core/Pages/Page.php:56
+msgid "Page Title"
+msgstr ""
+
+#: src/Core/Updater.php:244
+#, php-format
+msgid "Plugin %s is up to date."
+msgstr ""
+
 #: src/Core/Pages/StatisticsPage.php:95
 msgid "Reason:"
 msgstr ""
 
 #: src/Core/Pages/StatisticsPage.php:119
 msgid "Referer:"
+msgstr ""
+
+#: src/Core/Updater.php:237
+msgid "Security check failed."
 msgstr ""
 
 #: src/Core/Pages/StatisticsPage.php:76
