@@ -66,7 +66,7 @@ const LEXO_Captcha = new (class {
 
 			setTimeout(
 				() => resolve(),
-				Number(localStorage.getItem('lexo_captcha_token_recieval_timestamp')) + 15000 - Date.now(),
+				Number(localStorage.getItem('lexo_captcha_token_recieval_timestamp')) + lexocaptcha_globals.submit_cooldown - Date.now(),
 			);
 		});
 	}

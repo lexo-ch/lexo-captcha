@@ -58,6 +58,8 @@ final class Bootloader
         Loader::setup();
 
         CaptchaService::add_ajax_routes();
+
+        CaptchaService::pass_submit_cooldown_to_frontend();
     }
 
     public static function admin_menu()

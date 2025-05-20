@@ -4,7 +4,6 @@ namespace LEXO\Captcha\Core\Pages;
 
 use LEXO\Captcha\Core\Pages\Page;
 use LEXO\Captcha\Core\Services\CaptchaService;
-use LEXO\Captcha\Core\Services\CoreService;
 
 final class StatisticsPage extends Page
 {

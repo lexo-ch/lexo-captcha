@@ -2,6 +2,8 @@
 
 namespace LEXO\Captcha\Core\Services;
 
+use LEXO\Captcha\Core\Loader;
+
 final class CaptchaService {
     private function __construct()
     {
@@ -64,9 +66,25 @@ final class CaptchaService {
         ); // for guest users
     }
 
+    public static function pass_submit_cooldown_to_frontend() {
+        add_filter(
+            Loader::filter('front-script-globals'),
+            function($globals) {
+                $globals['submit_cooldown'] = apply_filters(
+                    CoreService::filter('submit-cooldown'),
+                    self::DEFAULT_SUBMIT_COOLDOWN,
+                );
+
+                return $globals;
+            },
+        );
+    }
+
     private static function get_timestamp() {
         return floor(microtime(true) * 1000);
     }
+
+    const DEFAULT_SUBMIT_COOLDOWN = 15000;
 
     private static function append_statistics($reason, $timestamp, $interaction, $given_token, $expected_token, $token_generation_timestamp, $additional_data = []) {
         $statistics = json_decode(get_option(
@@ -220,7 +238,7 @@ final class CaptchaService {
 
         $submit_cooldown = apply_filters(
             CoreService::filter('submit-cooldown'),
-            15000,
+            self::DEFAULT_SUBMIT_COOLDOWN,
         );
         
         // Form sent within 15 seconds since token generation.

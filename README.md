@@ -24,35 +24,51 @@ Requesting a token in the frontend can be done using the `LEXO_Captcha.requestTo
 
 ---
 ## Filters
-#### - `lexocaptcha/client-timestamp-tolerance`
+### Core
+For convenience, you may use `LEXO\Captcha\Core\Services\CoreService::filter($name)` to get the proper names to these filters.
+
+#### - `client-timestamp-tolerance`
 *Parameters*
 `apply_filters('lexocaptcha/client-timestamp-tolerance', $tolerance);`
-- $tolerance (int) The amount of time in ms client-supplied timestamps may be off from server time.
+- `$tolerance` (`int`) The amount of time in ms client-supplied timestamps may be off from server time.
 
-#### - `lexocaptcha/submit-cooldown`
+#### - `submit-cooldown`
 *Parameters*
 `apply_filters('lexocaptcha/submit-cooldown', $cooldown);`
-- $cooldown (int) The amount of time in ms that a client must wait after requesting a token before being allowed to use it.
+- `$cooldown` (`int`) The amount of time in ms that a client must wait after requesting a token before being allowed to use it.
 
-#### - `lexocaptcha/max-interaction-age`
+#### - `max-interaction-age`
 *Parameters*
 `apply_filters('lexocaptcha/max-interaction-age', $max_age);`
-- $max_age (int) The amount of time in ms before the client-supplied interaction data expires.
+- `$max_age` (`int`) The amount of time in ms before the client-supplied interaction data expires.
 
-#### - `lexocaptcha/max-token-age`
+#### - `max-token-age`
 *Parameters*
 `apply_filters('lexocaptcha/max-token-age', $max_age);`
-- $max_age (int) The amount of time in ms before the requested token expires.
+- `$max_age` (`int`) The amount of time in ms before the requested token expires.
 
-#### - `lexocaptcha/statistics-page/parent-slug`
+---
+### Loader
+For convenience, you may use `LEXO\Captcha\Core\Loader::filter($name)` to get the proper names to these filters.
+
+#### - `front-script-globals`
+*Parameters*
+`apply_filters('lexocaptcha/loader/front-script-globals', $globals);`
+- `$globals` (`array`) The variables to pass onto the frontend script. Will be accessible in `lexocaptcha_globals`.
+
+---
+### Statistics Page
+For convenience, you may use `LEXO\Captcha\Core\Pages\StatisticsPage::filter($name)` to get the proper names to these filters.
+
+#### - `parent-slug`
 *Parameters*
 `apply_filters('lexocaptcha/statistics-page/parent-slug', $parent_slug);`
-- $parent_slug (str) The slug of the parent menu page for the statistics page.
+- `$parent_slug` (`string`) The slug of the parent menu page for the statistics page.
 
-#### - `lexocaptcha/statistics-page/capability`
+#### - `capability`
 *Parameters*
 `apply_filters('lexocaptcha/statistics-page/capability', $capability);`
-- $capability (str) The user capability required to view the statistics page.
+- `$capability` (`string`) The user capability required to view the statistics page.
 
 ---
 ## Actions

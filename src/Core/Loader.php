@@ -3,6 +3,7 @@
 namespace LEXO\Captcha\Core;
 
 use LEXO\Captcha\Core;
+use LEXO\Captcha\Core\Services\CoreService;
 
 final class Loader
 {
@@ -21,6 +22,12 @@ final class Loader
         add_action(
             'wp_enqueue_scripts',
             [self::class, 'load_front_resources'],
+        );
+    }
+
+    public static function filter(string $name) {
+        return CoreService::filter(
+            "loader/{$name}",
         );
     }
 
@@ -70,9 +77,12 @@ final class Loader
             wp_localize_script(
                 Core::$domain . "-front-script",
                 Core::$domain . "_globals",
-                [
-                    'ajax_url' => admin_url('admin-ajax.php'),
-                ],
+                apply_filters(
+                    self::filter('front-script-globals'),
+                    [
+                        'ajax_url' => admin_url('admin-ajax.php'),
+                    ],
+                ),
             );
         }
 
