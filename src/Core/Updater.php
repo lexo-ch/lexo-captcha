@@ -103,7 +103,7 @@ final class Updater {
         ];
 
         $sections = apply_filters(
-            CoreService::filter('plugin_sections'),
+            CoreService::filter('plugin-sections'),
             $sections,
         );
 
