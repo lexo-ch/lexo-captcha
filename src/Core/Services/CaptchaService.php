@@ -8,7 +8,7 @@ final class CaptchaService {
         //
     }
 
-    public static function valid_referer() {
+    private static function valid_referer() {
         if (empty($_SERVER['SERVER_NAME'])) {
             return false;
         }
@@ -64,11 +64,11 @@ final class CaptchaService {
         ); // for guest users
     }
 
-    public static function get_timestamp() {
+    private static function get_timestamp() {
         return floor(microtime(true) * 1000);
     }
 
-    public static function append_statistics($reason, $timestamp, $interaction, $given_token, $expected_token, $token_generation_timestamp, $additional_data = []) {
+    private static function append_statistics($reason, $timestamp, $interaction, $given_token, $expected_token, $token_generation_timestamp, $additional_data = []) {
         $statistics = json_decode(get_option(
             'lexo_captcha_statistics',
             '[]',

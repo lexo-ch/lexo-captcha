@@ -39,7 +39,7 @@ final class Updater {
         );
     }
 
-    public static function request() {
+    private static function request() {
         $remote = get_transient(Core::$cache_key);
 
         if (empty($remote) || !self::CACHE) {
@@ -57,7 +57,7 @@ final class Updater {
         return $remote;
     }
 
-    public static function get_remote_data() {
+    private static function get_remote_data() {
         $remote_args = [
             'timeout' => 10,
             'headers' => [
