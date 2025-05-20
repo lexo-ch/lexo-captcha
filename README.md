@@ -25,7 +25,7 @@ Requesting a token in the frontend can be done using the `LEXO_Captcha.requestTo
 ---
 ## Filters
 ### Captcha
-For convenience, you may use `LEXO\Captcha\Core\Services\CaptchaService::filter($name)` to get the proper names to these filters.
+For convenience, you may use `LEXO\Captcha\Core\Services\CaptchaService::filter($name)` to get the full names (including path) to these filters.
 
 #### - `client-timestamp-tolerance`
 *Parameters*
@@ -49,7 +49,7 @@ For convenience, you may use `LEXO\Captcha\Core\Services\CaptchaService::filter(
 
 ---
 ### Loader
-For convenience, you may use `LEXO\Captcha\Core\Loader::filter($name)` to get the proper names to these filters.
+For convenience, you may use `LEXO\Captcha\Core\Loader::filter($name)` to get the full names (including path) to these filters.
 
 #### - `front-script-globals`
 *Parameters*
@@ -58,7 +58,7 @@ For convenience, you may use `LEXO\Captcha\Core\Loader::filter($name)` to get th
 
 ---
 ### Statistics Page
-For convenience, you may use `LEXO\Captcha\Core\Pages\StatisticsPage::filter($name)` to get the proper names to these filters.
+For convenience, you may use `LEXO\Captcha\Core\Pages\StatisticsPage::filter($name)` to get the full names (including path) to these filters.
 
 #### - `parent-slug`
 *Parameters*
