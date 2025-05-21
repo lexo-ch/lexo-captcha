@@ -1,0 +1,33 @@
+# 1.0.0 (2025-05-21)
+
+
+### Bug Fixes
+
+* **banners:** Replace ([61c2ccf](https://github.com/lexo-ch/lexo-captcha/commit/61c2ccf603e8d4819bb375bc423c74577d2a2ac3))
+* **composer:** Update config ([8cf1f38](https://github.com/lexo-ch/lexo-captcha/commit/8cf1f38dc7102b424769fec7f5c552d9fac25dc5))
+* **core:** Add front scripts globals filter ([ea82c26](https://github.com/lexo-ch/lexo-captcha/commit/ea82c268f1d8f11ed4f16b4d70ae807d7ce472f2))
+* **core:** Limit access modifiers ([17cd5fa](https://github.com/lexo-ch/lexo-captcha/commit/17cd5fafc4c6ec8a41220147f7e5fda6017927cc))
+* **core:** Move .github folder into proper place ([ef6bac9](https://github.com/lexo-ch/lexo-captcha/commit/ef6bac97bbeccf16c45ebe2a91f704a8198ecc3a))
+* **core:** Pre-release fixes ([67ec426](https://github.com/lexo-ch/lexo-captcha/commit/67ec426587f4c710a950dcf44fecbe3816f7edcd))
+* **core:** Progress ([85fe96e](https://github.com/lexo-ch/lexo-captcha/commit/85fe96ebeab28be75365e810dd95a7e6017ea6b4))
+* **core:** Progress ([e2c02d7](https://github.com/lexo-ch/lexo-captcha/commit/e2c02d7bd557119a7376b92cb8e0a62efb5a4d36))
+* **core:** Refactor ([2269f83](https://github.com/lexo-ch/lexo-captcha/commit/2269f8386ba3e97c6d0ae2c04b613e8e3625ff9f))
+* **core:** Refactor ([e8504b5](https://github.com/lexo-ch/lexo-captcha/commit/e8504b5392b313eaf5c3e10981135b637df0927a))
+* **core:** Refactor ([041e529](https://github.com/lexo-ch/lexo-captcha/commit/041e5292217d9a0adea8dadbceb48bcf5511e23d))
+* **core:** Refactor ([ccb2f06](https://github.com/lexo-ch/lexo-captcha/commit/ccb2f0645095bec213377797ffa4a48d03abf9e3))
+* **core:** Refactor ([46d50fe](https://github.com/lexo-ch/lexo-captcha/commit/46d50fef229b7fca76b13dc006a7a0500a554f8b))
+* **core:** Refactor ([6f5a4d0](https://github.com/lexo-ch/lexo-captcha/commit/6f5a4d01d5bee09454d3658344bd491c4c5a894f))
+* **core:** Refactor ([68525fe](https://github.com/lexo-ch/lexo-captcha/commit/68525fe2c25d1678b7a65f60a02c9827dd9d6c0e))
+* **core:** Refactor ([df2f8b0](https://github.com/lexo-ch/lexo-captcha/commit/df2f8b0e661d4e8c3c418f2e1ca2eea4254353b1))
+* **fitlers:** Prefix CaptchaService filters with captcha ([8c06788](https://github.com/lexo-ch/lexo-captcha/commit/8c06788421ad20d4fc81e6356b21205ece12eb04))
+* **localization:** Add missing strings ([bc206a4](https://github.com/lexo-ch/lexo-captcha/commit/bc206a43a56a61f6e5860a8698893245134fcffe))
+* **localization:** Implement ([fbe7429](https://github.com/lexo-ch/lexo-captcha/commit/fbe742965d9386900ef1b9d35aa58bb986d0f231))
+* **readme:** Clarify filter helpers ([bf044dc](https://github.com/lexo-ch/lexo-captcha/commit/bf044dc25e1fe303fd67edf2114efdacfbc14e5b))
+* **readme:** Create ([49d2fbf](https://github.com/lexo-ch/lexo-captcha/commit/49d2fbf4512f90c37d75e7956c7ef551e043a679))
+* **vite:** Optimise dev mode ([167dd03](https://github.com/lexo-ch/lexo-captcha/commit/167dd039b88d735007d18ad9ea3af52f2639fd90))
+
+
+### Features
+
+* **bundling:** Use Vite ([edd41c6](https://github.com/lexo-ch/lexo-captcha/commit/edd41c60e0849586fb3b51ac72d0abcf769fa304))
+* **captcha_service:** Implement ([fdc7874](https://github.com/lexo-ch/lexo-captcha/commit/fdc7874d8666904a12a80d5793b19d7c57f9a2a1))
