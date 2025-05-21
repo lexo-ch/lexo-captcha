@@ -1,0 +1,20 @@
+{
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vite build --watch",
+        "build": "vite build"
+    },
+    "devDependencies": {
+        "@semantic-release/changelog": "^6.0.3",
+        "@semantic-release/exec": "^7.0.3",
+        "@semantic-release/git": "^10.0.1",
+        "@semantic-release/github": "^11.0.2",
+        "@stylistic/eslint-plugin": "^4.2.0",
+        "eslint": "^9.25.1",
+        "prettier": "^3.5.3",
+        "semantic-release": "^24.2.3",
+        "terser": "^5.39.2",
+        "vite": "^6.3.5"
+    }
+}

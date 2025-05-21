@@ -1,0 +1,30 @@
+{
+    "name": "lexo/lexo-captcha",
+    "description": "WordPress plugin for simple, self-hosted hidden captcha evaluation.",
+    "version": "1.0.0",
+    "homepage": "https://www.lexo.ch/",
+    "license": "GPL-2.0-only",
+    "authors": [
+        {
+            "name": "LEXO GmbH",
+            "email": "websupport@lexo.ch"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "LEXO\\Captcha\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=7.4.1"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.7"
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "npm install",
+            "npm run build"
+        ]
+    }
+}

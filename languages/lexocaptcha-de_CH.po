@@ -1,0 +1,156 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: LEXO Captcha\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-05-20 07:32+0000\n"
+"PO-Revision-Date: 2025-05-20 08:33+0000\n"
+"Last-Translator: \n"
+"Language-Team: Deutsch (Schweiz)\n"
+"Language: de_CH\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.7.2; wp-6.8.1\n"
+"X-Domain: lexocaptcha\n"
+"X-Loco-Fallback: de_DE\n"
+"X-Loco-Template: languages/lexocaptcha-de_DE.po\n"
+"X-Loco-Template-Mode: PO,JSON"
+
+#: src/Core/Pages/StatisticsPage.php:164
+msgid "Additional Data"
+msgstr "Zusätzliche Daten"
+
+#: src/Core/Pages/StatisticsPage.php:37
+msgid "Captcha Statistics"
+msgstr "Captcha Statistiken"
+
+#: src/Core/Pages/StatisticsPage.php:41
+msgid "Caught Spam:"
+msgstr "Abgefangener Spam:"
+
+#: src/Core/Pages/StatisticsPage.php:103
+msgid "Evaluation Timestamp:"
+msgstr "Prüfungs-Zeitstempel:"
+
+#: src/Core/Pages/StatisticsPage.php:143
+msgid "Expected Token:"
+msgstr "Erwarteter Token:"
+
+#: src/Core/Services/CaptchaService.php:298
+msgid "Expired token."
+msgstr "Token abgelaufen."
+
+#: src/Core/Pages/StatisticsPage.php:127
+msgid "First Client Interaction Timestamp:"
+msgstr "Client-Erstinteraktions-Zeitstempel:"
+
+#. URI of the plugin
+msgid "https://github.com/lexo-ch/lexo-captcha/"
+msgstr "https://github.com/lexo-ch/lexo-captcha/"
+
+#. Author URI of the plugin
+msgid "https://www.lexo.ch"
+msgstr "https://www.lexo.ch"
+
+#: src/Core/Services/CaptchaService.php:300
+msgid "Interaction data expired."
+msgstr "Interaktions-Daten abgelaufen."
+
+#: src/Core/Services/CaptchaService.php:304
+msgid "Interaction data from the future, likely faked."
+msgstr "Interaktions-Daten aus der Zukunft, wahrscheinlich gefälscht."
+
+#: src/Core/Services/CaptchaService.php:312
+msgid "Interaction data missing."
+msgstr "Interaktions-Daten fehlen."
+
+#: src/Core/Services/CaptchaService.php:306
+msgid "Invalid token."
+msgstr "Ungültiger Token."
+
+#. Name of the plugin
+msgid "LEXO Captcha"
+msgstr "LEXO Captcha"
+
+#. Description of the plugin
+msgid "LEXO Captcha solution."
+msgstr "LEXO Captcha-Lösung."
+
+#: src/Core/Pages/StatisticsPage.php:16
+msgid "LEXO Captcha Statistics"
+msgstr "LEXO Captcha Statistiken"
+
+#. Author of the plugin
+msgid "LEXO GmbH"
+msgstr "LEXO GmbH:"
+
+#: src/Core/Services/CaptchaService.php:314
+msgid "Missing referer or invalid referer host."
+msgstr "Fehlender Referer oder ungültiger Referer-Host."
+
+#: src/Core/Services/CaptchaService.php:308
+msgid "No token requested."
+msgstr "Kein Token angefordert."
+
+#: src/Core/Pages/Page.php:56
+msgid "Page Title"
+msgstr "Seiten-Titel"
+
+#: src/Core/Updater.php:244
+#, php-format
+msgid "Plugin %s is up to date."
+msgstr "Plugin %s ist aktuell."
+
+#: src/Core/Pages/StatisticsPage.php:95
+msgid "Reason:"
+msgstr "Grund:"
+
+#: src/Core/Pages/StatisticsPage.php:119
+msgid "Referer:"
+msgstr "Referer:"
+
+#: src/Core/Updater.php:237
+msgid "Security check failed."
+msgstr "Sicherheits-Prüfung gescheitert."
+
+#: src/Core/Pages/StatisticsPage.php:76
+msgid "Spam Log"
+msgstr "Spam Log"
+
+#: src/Core/Pages/StatisticsPage.php:62
+msgid "Spam Quota:"
+msgstr "Spam-Quote:"
+
+#: src/Core/Services/CoreService.php:42
+msgid "Statistics"
+msgstr "Statistiken"
+
+#: src/Core/Services/CaptchaService.php:302
+msgid "Submitted too early."
+msgstr "Versand zu früh."
+
+#: src/Core/Pages/StatisticsPage.php:151
+msgid "Token Generation Timestamp:"
+msgstr "Token-Generierungs-Zeitstempel:"
+
+#: src/Core/Pages/StatisticsPage.php:135
+msgid "Token Given by Client:"
+msgstr "Vom Client erhaltener Token:"
+
+#: src/Core/Services/CaptchaService.php:310
+msgid "Token missing."
+msgstr "Token fehlt."
+
+#: src/Core/Pages/StatisticsPage.php:49
+msgid "Total Evaluations:"
+msgstr "Totale Prüfungen:"
+
+#: src/Core/Services/CoreService.php:37
+msgid "Update Check"
+msgstr "Update Überprüfung"
+
+#: src/Core/Pages/StatisticsPage.php:111
+msgid "User-Agent:"
+msgstr "User-Agent:"
