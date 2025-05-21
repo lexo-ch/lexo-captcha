@@ -10,7 +10,7 @@
     "tested": "6.8.0",
     "requires_php": "7.4.1",
     "sections": {
-        "description": "Automatically converts images to WebP format upon upload.<br><a href='https://github.com/lexo-ch/lexo-captcha/' target='_blank'>More about plugin</a>",
+        "description": "LEXO Captcha solution.<br><a href='https://github.com/lexo-ch/lexo-captcha/' target='_blank'>More about plugin</a>",
         "changelog": "Click <a href='https://github.com/lexo-ch/lexo-captcha/releases/latest/' target='_blank'>here</a> to see changelog."
     },
     "banners": {
