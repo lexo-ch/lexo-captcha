@@ -57,7 +57,7 @@ final class Updater {
         return $remote;
     }
 
-    private static function get_remote_data() {
+    private static function get_remote_data(): array|false {
         $remote_args = [
             'timeout' => 10,
             'headers' => [
@@ -82,7 +82,7 @@ final class Updater {
         return $remote;
     }
 
-    public static function info($res, $action, $args) {
+    public static function info(object $res, string $action, object $args): object {
         if ($action !== 'plugin_information') {
             return $res;
         }
@@ -177,7 +177,7 @@ final class Updater {
         return $transient;
     }
 
-    public static function purge($upgrader, $options) {
+    public static function purge($_upgrader, array $options): void {
         if (!self::CACHE) {
             return;
         }
@@ -193,7 +193,7 @@ final class Updater {
         delete_transient(Core::$cache_key);
     }
 
-    public static function has_update() {
+    public static function has_update(): bool {
         $remote = self::get_remote_data();
 
         if (empty($remote)) {
@@ -221,7 +221,7 @@ final class Updater {
         return true;
     }
 
-    public static function update_check_url() {
+    public static function update_check_url(): string {
         return add_query_arg(
             [
                 'action' => self::$check_update_action,
@@ -231,8 +231,7 @@ final class Updater {
         );
     }
 
-    public static function check_for_update()
-    {
+    public static function check_for_update(): void {
         if (!wp_verify_nonce($_REQUEST['nonce'], self::$check_update_action)) {
             wp_die(__('Security check failed.', 'lexocaptcha'));
         }
@@ -256,7 +255,7 @@ final class Updater {
         }
     }
 
-    public static function next_update_check() {
+    public static function next_update_check(): string|false {
         $expiration_datetime = get_option('_transient_timeout_' . Core::$cache_key);
 
         if (!$expiration_datetime) {
@@ -269,7 +268,7 @@ final class Updater {
         );
     }
 
-    public static function no_updates_notice() {
+    public static function no_updates_notice(): bool {
         $message = get_transient(Core::$domain . '_no_updates_notice');
 
         delete_transient(Core::$domain . '_no_updates_notice');
@@ -289,9 +288,11 @@ final class Updater {
                 ],
             ],
         );
+
+        return true;
     }
 
-    public static function update_success_notice() {
+    public static function update_success_notice(): bool {
         $message = get_transient(Core::$domain . '_update_success_notice');
 
         delete_transient(Core::$domain . '_update_success_notice');
@@ -311,5 +312,7 @@ final class Updater {
                 ],
             ],
         );
+
+        return true;
     }
 }

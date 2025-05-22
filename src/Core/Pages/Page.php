@@ -6,37 +6,36 @@ use LEXO\Captcha\Core;
 use LEXO\Captcha\Core\Services\CoreService;
 
 class Page {
-    private function __construct()
-    {
+    protected function __construct() {
         //
     }
 
-    public static function base_slug() {
+    public static function base_slug(): string {
         return 'base';
     }
 
-    public static function base_capability() {
+    public static function base_capability(): string {
         return Core::BASE_CAPABILITY;
     }
 
-    public static function filter($name) {
+    public static function filter(string $name): string {
         return CoreService::filter(
             trailingslashit(static::base_slug() . '-page') . $name,
         );
     }
 
-    public static function slug() {
+    public static function slug(): string {
         return CoreService::slug(static::base_slug());
     }
 
-    public static function parent_slug() {
+    public static function parent_slug(): string {
         return apply_filters(
             static::filter('parent-slug'),
             'options-general.php',
         );
     }
 
-    public static function url() {
+    public static function url(): string {
         $path = static::parent_slug();
 
         if (strpos($path, '.php') === false) {
@@ -52,18 +51,18 @@ class Page {
         );
     }
 
-    public static function title() {
+    public static function title(): string {
         return __('Page Title', 'lexocaptcha');
     }
 
-    public static function capability() {
+    public static function capability(): string {
         return apply_filters(
             static::filter('capability'),
             static::base_capability(),
         );
     }
 
-    public static function add_page() {
+    public static function add_page(): void {
         add_submenu_page(
             static::parent_slug(),
             static::title(),
@@ -74,9 +73,7 @@ class Page {
         );
     }
 
-    public static function content() {
+    public static function content(): void {
         //
     }
 }
-
-?>

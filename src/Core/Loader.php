@@ -5,15 +5,12 @@ namespace LEXO\Captcha\Core;
 use LEXO\Captcha\Core;
 use LEXO\Captcha\Core\Services\CoreService;
 
-final class Loader
-{
-    private function __construct()
-    {
+final class Loader {
+    private function __construct() {
         //
     }
 
-    public static function setup()
-    {
+    public static function setup() {
         add_action(
             'admin_enqueue_scripts',
             [self::class, 'load_admin_resources'],

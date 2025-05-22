@@ -6,14 +6,12 @@ use LEXO\Captcha\Core;
 use LEXO\Captcha\Core\Updater;
 use LEXO\Captcha\Core\Pages\StatisticsPage;
 
-final class CoreService
-{
-    private function __construct()
-    {
+final class CoreService {
+    private function __construct() {
         //
     }
 
-    public static function can_manage_plugin() {
+    public static function can_manage_plugin(): bool {
         if (!is_user_logged_in()) {
             return false;
         }
@@ -21,15 +19,15 @@ final class CoreService
         return current_user_can(Core::BASE_CAPABILITY);
     }
 
-    public static function action($name) {
+    public static function action(string $name): string {
         return trailingslashit(Core::$domain) . $name;
     }
 
-    public static function filter($name) {
+    public static function filter(string $name): string {
         return trailingslashit(Core::$domain) . $name;
     }
 
-    public static function add_pages() {
+    public static function add_pages(): void {
         StatisticsPage::add_page();
 
         self::add_plugin_action(
@@ -43,7 +41,7 @@ final class CoreService
         );
     }
 
-    public static function add_plugin_action(string $url, string $title) {
+    public static function add_plugin_action(string $url, string $title): void {
         ob_start();
 
         ?>
@@ -66,7 +64,7 @@ final class CoreService
         );
     }
 
-    public static function slug($name) {
+    public static function slug(string $name): string {
         return Core::$plugin_slug . "-{$name}";
     }
 }
