@@ -82,7 +82,7 @@ final class Updater {
         return $remote;
     }
 
-    public static function info(object $res, string $action, object $args): object {
+    public static function info(object|false $res, string $action, object $args): object|false {
         if ($action !== 'plugin_information') {
             return $res;
         }
