@@ -64,9 +64,13 @@ const LEXO_Captcha = new (class {
 				await this.requestToken();
 			}
 
+			const recieval_timestmap = Number(localStorage.getItem('lexo_captcha_token_recieval_timestamp'));
+
+			const submit_cooldown = Number(lexocaptcha_globals.submit_cooldown);
+
 			setTimeout(
 				() => resolve(),
-				Number(localStorage.getItem('lexo_captcha_token_recieval_timestamp')) + lexocaptcha_globals.submit_cooldown - Date.now(),
+				recieval_timestmap + submit_cooldown - Date.now(),
 			);
 		});
 	}
