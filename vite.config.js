@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import {defineConfig} from 'vite';
 
 export default defineConfig({
 	build: {
@@ -36,6 +36,6 @@ export default defineConfig({
 	},
 	watch: {
 		include: ['resources/**'],
-		exclude: ['node_modules/**', 'dist/**'],
+		exclude: ['node_modules/**', 'dist/**', 'vendor/**'],
 	},
 });

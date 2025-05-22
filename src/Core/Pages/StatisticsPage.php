@@ -5,17 +5,16 @@ namespace LEXO\Captcha\Core\Pages;
 use LEXO\Captcha\Core\Pages\Page;
 use LEXO\Captcha\Core\Services\CaptchaService;
 
-final class StatisticsPage extends Page
-{
-    public static function base_slug() {
+final class StatisticsPage extends Page {
+    public static function base_slug(): string {
         return 'statistics';
     }
 
-    public static function title() {
+    public static function title(): string {
         return __('LEXO Captcha Statistics', 'lexocaptcha');
     }
 
-    public static function content() {
+    public static function content(): void {
         $statistics = json_decode(get_option(
             'lexo_captcha_statistics',
             '[]',

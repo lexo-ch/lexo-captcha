@@ -32,6 +32,8 @@ if (!defined('WPINC')) {
 final class Core {
     public const FILE = __FILE__;
 
+    public const BASE_CAPABILITY = 'administrator';
+
     public static string $plugin_name;
 
     public static string $plugin_slug;
@@ -57,8 +59,6 @@ final class Core {
     public static string $cache_key;
 
     public static string $update_path;
-
-    const BASE_CAPABILITY = 'administrator';
 }
 
 try {

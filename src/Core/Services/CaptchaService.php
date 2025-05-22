@@ -5,18 +5,19 @@ namespace LEXO\Captcha\Core\Services;
 use LEXO\Captcha\Core\Loader;
 
 final class CaptchaService {
-    private function __construct()
-    {
+    public const DEFAULT_SUBMIT_COOLDOWN = 15000;
+
+    private function __construct() {
         //
     }
 
-    public static function filter(string $name) {
-        return self::filter(
+    public static function filter(string $name): string {
+        return CoreService::filter(
             "captcha/{$name}",
         );
     }
 
-    private static function valid_referer() {
+    private static function valid_referer(): bool {
         if (empty($_SERVER['SERVER_NAME'])) {
             return false;
         }
@@ -40,7 +41,7 @@ final class CaptchaService {
         return true;
     }
 
-    public static function request_token() {
+    public static function request_token(): void {
         if (!self::valid_referer()) {
             if (isset($_SESSION['LEXO_CAPTCHA_TOKEN'])) {
                 unset($_SESSION['LEXO_CAPTCHA_TOKEN']);
@@ -60,7 +61,7 @@ final class CaptchaService {
         exit;
     }
 
-    public static function add_ajax_routes() {
+    public static function add_ajax_routes(): void {
         add_action(
             'wp_ajax_lexo_captcha_request_token',
             [self::class, 'request_token'],
@@ -72,7 +73,7 @@ final class CaptchaService {
         ); // for guest users
     }
 
-    public static function pass_submit_cooldown_to_frontend() {
+    public static function pass_submit_cooldown_to_frontend(): void {
         add_filter(
             Loader::filter('front-script-globals'),
             function($globals) {
@@ -86,13 +87,19 @@ final class CaptchaService {
         );
     }
 
-    private static function get_timestamp() {
+    private static function get_timestamp(): float {
         return floor(microtime(true) * 1000);
     }
 
-    const DEFAULT_SUBMIT_COOLDOWN = 15000;
-
-    private static function append_statistics($reason, $timestamp, $interaction, $given_token, $expected_token, $token_generation_timestamp, $additional_data = []) {
+    private static function append_statistics(
+        string $reason,
+        float $timestamp,
+        ?float $interaction,
+        ?string $given_token,
+        string $expected_token,
+        float $token_generation_timestamp,
+        array $additional_data = []
+    ): void {
         $statistics = json_decode(get_option(
             'lexo_captcha_statistics',
             '[]',
@@ -127,7 +134,7 @@ final class CaptchaService {
         );
     }
 
-    public static function evaluate_data(?string $data = null) {
+    public static function evaluate_data(?string $data = null): bool {
         if (empty($data)) {
             $data = $_POST['lexo_captcha_data'];
         }
@@ -316,7 +323,7 @@ final class CaptchaService {
         return true;
     }
 
-    public static function describe_reason($reason) {
+    public static function describe_reason(string $reason): string {
         switch ($reason) {
             case 'expired-token':
                 return __('Expired token.', 'lexocaptcha');
