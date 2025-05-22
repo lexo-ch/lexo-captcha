@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/lexo-ch/lexo-captcha/compare/v1.0.1...v1.0.2) (2025-05-22)
+
+
+### Bug Fixes
+
+* **updater:** Fix type constraints ([7f6e01d](https://github.com/lexo-ch/lexo-captcha/commit/7f6e01d633859aee982e31bef9ff85a3c5038d71))
+
 ## [1.0.1](https://github.com/lexo-ch/lexo-captcha/compare/v1.0.0...v1.0.1) (2025-05-22)
 
 
