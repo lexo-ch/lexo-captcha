@@ -1,3 +1,12 @@
+## [1.0.1](https://github.com/lexo-ch/lexo-captcha/compare/v1.0.0...v1.0.1) (2025-05-22)
+
+
+### Bug Fixes
+
+* **core:** Add type annotations ([4bc6bad](https://github.com/lexo-ch/lexo-captcha/commit/4bc6bad92e3d22f5ffef1765b3027f904a502f0d))
+* **core:** Clean up ([40f0591](https://github.com/lexo-ch/lexo-captcha/commit/40f0591059991288484700dcf6492ee76c3f66dd))
+* **core:** Optimisations ([0770dbd](https://github.com/lexo-ch/lexo-captcha/commit/0770dbd5665c5bc0d0e837e9df9e70f8fc10b3a8))
+
 # 1.0.0 (2025-05-21)
 
 
