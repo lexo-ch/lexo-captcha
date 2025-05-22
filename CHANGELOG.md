@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/lexo-ch/lexo-captcha/compare/v1.0.2...v1.0.3) (2025-05-22)
+
+
+### Bug Fixes
+
+* **captcha:** Fix awaiting cooldown ([457a013](https://github.com/lexo-ch/lexo-captcha/commit/457a013ceb22217741a12875c08a0501eff1422a))
+
 ## [1.0.2](https://github.com/lexo-ch/lexo-captcha/compare/v1.0.1...v1.0.2) (2025-05-22)
 
 
