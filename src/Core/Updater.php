@@ -7,7 +7,7 @@ use LEXO\Captcha\Core;
 use LEXO\Captcha\Core\Services\CoreService;
 
 final class Updater {
-    const CACHE = true;
+    public const CACHE = true;
 
     public static string $check_update_action;
 
