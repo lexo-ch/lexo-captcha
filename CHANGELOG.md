@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/lexo-ch/lexo-captcha/compare/v2.0.0...v2.0.1) (2025-08-31)
+
+
+### Bug Fixes
+
+* **build:** Include functions folder in build ([42de723](https://github.com/lexo-ch/lexo-captcha/commit/42de7233ab96841e80a0fd8f6010e8aa38063bbb))
+
 # [2.0.0](https://github.com/lexo-ch/lexo-captcha/compare/v1.0.3...v2.0.0) (2025-08-31)
 
 
