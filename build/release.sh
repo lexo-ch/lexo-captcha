@@ -31,6 +31,7 @@ cp -r languages lexo-captcha
 cp -r dist lexo-captcha
 cp -r src lexo-captcha
 cp -r vendor lexo-captcha
+cp -r functions lexo-captcha
 
 cp ./*.php lexo-captcha
 cp LICENSE lexo-captcha
