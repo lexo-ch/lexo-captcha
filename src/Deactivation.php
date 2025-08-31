@@ -2,12 +2,14 @@
 
 namespace LEXO\Captcha;
 
-final class Deactivation {
-    private function __construct() {
-        //
-    }
+use const LEXO\Captcha\{
+    CACHE_KEY
+};
 
-    public static function run(): void {
-        delete_transient(Core::$cache_key);
+class Deactivation
+{
+    public static function run(): void
+    {
+        delete_transient(CACHE_KEY);
     }
 }

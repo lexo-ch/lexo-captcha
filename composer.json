@@ -13,7 +13,10 @@
     "autoload": {
         "psr-4": {
             "LEXO\\Captcha\\": "src/"
-        }
+        },
+        "files": [
+            "functions/helpers.php"
+        ]
     },
     "require": {
         "php": ">=7.4.1"

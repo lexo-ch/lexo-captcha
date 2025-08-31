@@ -1,4 +1,4 @@
-const LEXO_Captcha = new (class {
+window.LEXO_Captcha = new (class {
 	/**
 	 * @type {number?}
 	 */
@@ -41,16 +41,22 @@ const LEXO_Captcha = new (class {
 
 		data.append('action', 'lexo_captcha_request_token');
 
-		this.#token_ready = new Promise(async resolve => {
-			const response = await fetch(lexocaptcha_globals.ajax_url, {
+		this.#token_ready = new Promise(async (resolve, reject) => {
+			const response = await fetch(lexocaptchaFrontLocalized.ajax_url, {
 				method: 'POST',
 				body: data,
 			});
 
-			localStorage.setItem('lexo_captcha_token', await response.text());
-			localStorage.setItem('lexo_captcha_token_recieval_timestamp', Date.now());
+      const result = await response.json();
 
-			resolve();
+			if (result && result.success) {
+        localStorage.setItem('lexo_captcha_token', result.data.token);
+        localStorage.setItem('lexo_captcha_token_recieval_timestamp', Date.now());
+        resolve();
+      } else {
+        console.error('Failed to get token:', result.data?.message);
+        reject(new Error(result.data?.message || 'Token request failed'));
+      }
 
 			this.#token_ready = null;
 		});
@@ -59,14 +65,14 @@ const LEXO_Captcha = new (class {
 	}
 
 	#request_submit() {
-		return new Promise(async (resolve, reject) => {
+		return new Promise(async resolve => {
 			if (!localStorage.getItem('lexo_captcha_token_recieval_timestamp')) {
 				await this.requestToken();
 			}
 
 			const recieval_timestmap = Number(localStorage.getItem('lexo_captcha_token_recieval_timestamp'));
 
-			const submit_cooldown = Number(lexocaptcha_globals.submit_cooldown);
+			const submit_cooldown = Number(lexocaptchaFrontLocalized.submit_cooldown);
 
 			setTimeout(
 				() => resolve(),
@@ -226,7 +232,7 @@ const LEXO_Captcha = new (class {
 					await this.compileData(),
 				);
 
-				const response = await (await fetch(lexocaptcha_globals.ajax_url, {
+				const response = await (await fetch(lexocaptchaFrontLocalized.ajax_url, {
 					method: 'POST',
 					body: body,
 				})).text();
@@ -326,7 +332,7 @@ const LEXO_Captcha = new (class {
 					await this.compileData(),
 				);
 
-				const response = await (await fetch(lexocaptcha_globals.ajax_url, {
+				const response = await (await fetch(lexocaptchaFrontLocalized.ajax_url, {
 					method: 'POST',
 					body: body,
 				})).json();

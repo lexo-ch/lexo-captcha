@@ -2,12 +2,9 @@
 
 namespace LEXO\Captcha;
 
-final class Uninstalling {
-    private function __construct() {
-        //
-    }
-
-    public static function run(): void {
-        //
+class Uninstalling
+{
+    public static function run(): void
+    {
     }
 }

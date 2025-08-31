@@ -9,7 +9,7 @@ export default [{
 		globals: {
 			...globals.browser,
 			'jQuery': true,
-			'lexocaptcha_globals': true,
+      'lexocaptchaFrontLocalized': true,
 			'currentLang': true,
 		},
 	},
