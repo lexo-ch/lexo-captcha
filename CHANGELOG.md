@@ -1,3 +1,13 @@
+# [2.0.0](https://github.com/lexo-ch/lexo-captcha/compare/v1.0.3...v2.0.0) (2025-08-31)
+
+
+* feat!: Fixing structure, syntax, security and usage issues ([0f75785](https://github.com/lexo-ch/lexo-captcha/commit/0f757859b6ba113f87843fee189de6174a616654))
+
+
+### BREAKING CHANGES
+
+* Fixing structure, syntax, security and usage issues
+
 ## [1.0.3](https://github.com/lexo-ch/lexo-captcha/compare/v1.0.2...v1.0.3) (2025-05-22)
 
 
