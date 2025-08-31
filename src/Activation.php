@@ -2,12 +2,9 @@
 
 namespace LEXO\Captcha;
 
-final class Activation {
-    private function __construct() {
-        //
-    }
-
-    public static function run(): void {
-        //
+final class Activation
+{
+    public function run(): void
+    {
     }
 }

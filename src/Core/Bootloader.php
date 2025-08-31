@@ -2,68 +2,89 @@
 
 namespace LEXO\Captcha\Core;
 
-use LEXO\Captcha\Core;
-use LEXO\Captcha\Core\Loader;
-use LEXO\Captcha\Core\Services\CaptchaService;
-use LEXO\Captcha\Core\Updater;
-use LEXO\Captcha\Core\Services\CoreService;
+use LEXO\Captcha\Core\PluginService;
+use LEXO\Captcha\Core\Abstracts\Singleton;
 
-final class Bootloader {
-    private function __construct() {
-        //
-    }
+use const LEXO\Captcha\{
+    DOMAIN,
+    PATH,
+    LOCALES
+};
 
-    public static function run(): void {
+class Bootloader extends Singleton
+{
+    protected static $instance = null;
+
+    public static function run(): void
+    {
         add_action(
             'init',
-            [self::class, 'init'],
+            [self::class, 'onInit'],
             10,
         );
 
         add_action(
             'after_setup_theme',
-            [self::class, 'after_setup_theme'],
-        );
-
-        add_action(
-            'admin_menu',
-            [self::class, 'admin_menu'],
-            100,
+            [self::class, 'onAfterSetupTheme'],
         );
 
         add_action(
             'admin_notices',
-            [self::class, 'admin_notices'],
+            [self::class, 'onAdminNotices'],
+        );
+
+        add_action(
+            'admin_menu',
+            [self::class, 'onAdminMenu'],
+        );
+
+        add_action(
+            DOMAIN . '/localize/front.js',
+            [self::class, 'onFrontLexoCaptchaJsLoad']
         );
     }
 
-    public static function init(): void {
-        do_action(CoreService::action('init'));
+    public static function onInit(): void
+    {
+        do_action(DOMAIN . '/init');
 
-        Loader::setup();
+        if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
+            session_start();
+        }
 
-        CaptchaService::add_ajax_routes();
-
-        CaptchaService::pass_submit_cooldown_to_frontend();
+        $plugin_service = PluginService::getInstance();
+        $plugin_service->setNamespace(DOMAIN);
+        $plugin_service->registerNamespace();
+        $plugin_service->addAjaxRoutes();
+        $plugin_service->addPluginLinks();
     }
 
-    public static function admin_menu(): void {
-        CoreService::add_pages();
+    public static function onAdminNotices(): void
+    {
+        $plugin_service = PluginService::getInstance();
+        $plugin_service->noUpdatesNotice();
+        $plugin_service->updateSuccessNotice();
     }
 
-    public static function admin_notices(): void {
-        Updater::no_updates_notice();
-
-        Updater::update_success_notice();
+    public static function onAdminMenu(): void
+    {
+        $plugin_service = PluginService::getInstance();
+        $plugin_service->addStatisticsPage();
     }
 
-    public static function after_setup_theme(): void {
-        load_plugin_textdomain(
-            Core::$domain,
-            false,
-            trailingslashit(trailingslashit(basename(Core::$path)) . Core::$locales),
-        );
+    public static function onAfterSetupTheme(): void
+    {
+        self::loadPluginTextdomain();
+        PluginService::getInstance()->updater()->run();
+    }
 
-        Updater::setup();
+    public static function onFrontLexoCaptchaJsLoad(): void
+    {
+        PluginService::getInstance()->addFrontLocalizedScripts();
+    }
+
+    public static function loadPluginTextdomain(): void
+    {
+        load_plugin_textdomain(DOMAIN, false, trailingslashit(trailingslashit(basename(PATH)) . LOCALES));
     }
 }
