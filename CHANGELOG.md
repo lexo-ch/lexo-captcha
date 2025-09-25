@@ -1,3 +1,10 @@
+## [2.0.2](https://github.com/lexo-ch/lexo-captcha/compare/v2.0.1...v2.0.2) (2025-09-25)
+
+
+### Bug Fixes
+
+* **core:** Fix Statistics page not showing bug ([a460fad](https://github.com/lexo-ch/lexo-captcha/commit/a460fade4111465fc1bf67b5eb885fd514df2c36))
+
 ## [2.0.1](https://github.com/lexo-ch/lexo-captcha/compare/v2.0.0...v2.0.1) (2025-08-31)
 
 
