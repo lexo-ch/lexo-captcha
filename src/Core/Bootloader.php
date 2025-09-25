@@ -36,6 +36,7 @@ class Bootloader extends Singleton
         add_action(
             'admin_menu',
             [self::class, 'onAdminMenu'],
+            200
         );
 
         add_action(
