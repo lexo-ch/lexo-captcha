@@ -98,7 +98,7 @@ window.LEXO_Captcha = new (class {
 	/**
 	 * @param {string} message
 	 */
-	#notify(message) {
+  #notify(message, $success = true) {
 		if (!message.length) {
 			message = 'Error: Message not send! Please try again.';
 		}
@@ -109,6 +109,12 @@ window.LEXO_Captcha = new (class {
 		notification.innerHTML = message;
 
 		document.body.append(notification);
+
+    if ($success) {
+      notification.classList.add('success');
+    } else {
+      notification.classList.add('error');
+    }
 
 		setTimeout(() => notification.classList.add('active'), 100);
 
@@ -337,7 +343,7 @@ window.LEXO_Captcha = new (class {
 					body: body,
 				})).json();
 
-				this.#notify(response.data);
+        this.#notify(response.data, response.success);
 
 				if (response.success) {
 					form.reset();
