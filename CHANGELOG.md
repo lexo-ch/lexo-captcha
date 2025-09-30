@@ -1,3 +1,10 @@
+## [2.0.3](https://github.com/lexo-ch/lexo-captcha/compare/v2.0.2...v2.0.3) (2025-09-30)
+
+
+### Bug Fixes
+
+* **notification:** Add response status class ([9361d24](https://github.com/lexo-ch/lexo-captcha/commit/9361d24805c73415a2c9e9230697a7794d6d3ccd))
+
 ## [2.0.2](https://github.com/lexo-ch/lexo-captcha/compare/v2.0.1...v2.0.2) (2025-09-25)
 
 
