@@ -1,3 +1,11 @@
+## [2.0.4](https://github.com/lexo-ch/lexo-captcha/compare/v2.0.3...v2.0.4) (2025-10-21)
+
+
+### Bug Fixes
+
+* **code:** Add lexocaptcha:response event ([3cf8b63](https://github.com/lexo-ch/lexo-captcha/commit/3cf8b634c55663046eca3e334ea32312792bb5d5))
+* **validate.js:** Fix email validation ([50b52c8](https://github.com/lexo-ch/lexo-captcha/commit/50b52c82b907232f73ed5b6cc1fd39ff50079097))
+
 ## [2.0.3](https://github.com/lexo-ch/lexo-captcha/compare/v2.0.2...v2.0.3) (2025-09-30)
 
 
