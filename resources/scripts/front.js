@@ -343,6 +343,16 @@ window.LEXO_Captcha = new (class {
 					body: body,
 				})).json();
 
+        const responseEvent = new CustomEvent('lexocaptcha:response', {
+          detail: {
+            form: form,
+            success: response.success
+          },
+          bubbles: true,
+          cancelable: false
+        });
+        form.dispatchEvent(responseEvent);
+
         this.#notify(response.data, response.success);
 
 				if (response.success) {

@@ -86,6 +86,31 @@ Requesting a token in the frontend can be done using the `LEXO_Captcha.requestTo
 #### - `lexoscripts/localize/front.js`
 - Fires right before LEXO Captcha frontend script has been enqueued.
 
+## Custom JavaScript Events
+
+#### - `lexocaptcha:response`
+- Fires on form submit.
+
+Event can be listened in your theme using `addEventListener`.
+
+##### Example
+
+```js
+document.addEventListener('lexocaptcha:response', (event) => {
+  const {
+    form,
+    success
+  } = event.detail;
+
+  console.log('The form element:', form);
+  console.log({ success });
+
+  // You can check which form it was and do something specific for this form
+  if (form.dataset.action === 'send_contact_email') {
+    console.log('This is the contact form. Do some specific action.');
+  }
+});
+```
 ---
 ## Changelog
 Changelog can be seen on [latest release](https://github.com/lexo-ch/lexo-captcha/releases/latest/).
