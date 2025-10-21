@@ -1,3 +1,10 @@
+## [2.0.5](https://github.com/lexo-ch/lexo-captcha/compare/v2.0.4...v2.0.5) (2025-10-21)
+
+
+### Bug Fixes
+
+* **core:** Return POST data ([8e3c21f](https://github.com/lexo-ch/lexo-captcha/commit/8e3c21fbec4e41839db1bed823804478017f7f2d))
+
 ## [2.0.4](https://github.com/lexo-ch/lexo-captcha/compare/v2.0.3...v2.0.4) (2025-10-21)
 
 
