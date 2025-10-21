@@ -378,6 +378,10 @@ window.LEXO_Captcha = new (class {
 	}
 
 	constructor() {
+    jQuery.validator.methods.email = function (value, element) {
+      return this.optional(element) || /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(value);
+    };
+
 		for (const interaction_event of this.#interaction_events) {
 			document.addEventListener(interaction_event, this.#record_interaction);
 		}
