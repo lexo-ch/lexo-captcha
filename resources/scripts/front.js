@@ -346,7 +346,8 @@ window.LEXO_Captcha = new (class {
         const responseEvent = new CustomEvent('lexocaptcha:response', {
           detail: {
             form: form,
-            success: response.success
+            success: response.success,
+            data: Object.fromEntries(body.entries())
           },
           bubbles: true,
           cancelable: false

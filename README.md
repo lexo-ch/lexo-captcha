@@ -99,11 +99,13 @@ Event can be listened in your theme using `addEventListener`.
 document.addEventListener('lexocaptcha:response', (event) => {
   const {
     form,
-    success
+    success,
+    data
   } = event.detail;
 
   console.log('The form element:', form);
   console.log({ success });
+  console.log({ data });
 
   // You can check which form it was and do something specific for this form
   if (form.dataset.action === 'send_contact_email') {
