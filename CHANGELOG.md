@@ -1,3 +1,10 @@
+## [2.0.6](https://github.com/lexo-ch/lexo-captcha/compare/v2.0.5...v2.0.6) (2025-10-29)
+
+
+### Bug Fixes
+
+* **core:** Allow token to be null ([a5ba608](https://github.com/lexo-ch/lexo-captcha/commit/a5ba608439fa31e8617dc36beea6462bb62c7998))
+
 ## [2.0.5](https://github.com/lexo-ch/lexo-captcha/compare/v2.0.4...v2.0.5) (2025-10-21)
 
 
