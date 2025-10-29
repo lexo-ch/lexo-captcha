@@ -1,3 +1,10 @@
+## [2.0.7](https://github.com/lexo-ch/lexo-captcha/compare/v2.0.6...v2.0.7) (2025-10-29)
+
+
+### Bug Fixes
+
+* **core:** Allow session to be null ([89f51c6](https://github.com/lexo-ch/lexo-captcha/commit/89f51c60a94147f0d6bc870ca5a63b95454e9d5d))
+
 ## [2.0.6](https://github.com/lexo-ch/lexo-captcha/compare/v2.0.5...v2.0.6) (2025-10-29)
 
 
