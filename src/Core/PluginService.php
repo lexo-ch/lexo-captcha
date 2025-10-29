@@ -325,7 +325,7 @@ class PluginService extends Singleton
         float $timestamp,
         ?float $interaction,
         ?string $given_token,
-        string $expected_token,
+        ?string $expected_token,
         float $token_generation_timestamp,
         array $additional_data = []
     ): void {
