@@ -26,6 +26,7 @@ class PluginService extends Singleton
     private static string $namespace        = 'custom-plugin-namespace';
     protected static $instance              = null;
     private static int $submit_cooldown     = 15000;
+    private const TOKEN_NONCE_FIELD         = 'token_nonce';
     private const CHECK_UPDATE              = 'check-update-' . PLUGIN_SLUG;
     private const MANAGE_PLUGIN_CAP         = 'manage_options';
     private const STATISTICS_PARENT_SLUG    = 'options-general.php';
@@ -99,6 +100,7 @@ class PluginService extends Singleton
             'min_wp_version'    => MIN_WP_VERSION,
             'text_domain'       => DOMAIN,
             'ajax_url'          => admin_url('admin-ajax.php'),
+            'token_nonce'       => wp_create_nonce(self::getRequestTokenNonceAction()),
             'submit_cooldown'   => self::$submit_cooldown,
         ];
 
@@ -242,63 +244,218 @@ class PluginService extends Singleton
         );
     }
 
+    private static function normalizeHost(?string $host): ?string
+    {
+        if (!is_string($host) || $host === '') {
+            return null;
+        }
+
+        $host = strtolower(trim($host));
+
+        if ($host === '') {
+            return null;
+        }
+
+        if (strpos($host, '://') !== false) {
+            $parsed = wp_parse_url($host, PHP_URL_HOST);
+
+            if (!is_string($parsed) || $parsed === '') {
+                return null;
+            }
+
+            $host = strtolower($parsed);
+        }
+
+        $host = preg_replace('/:\\d+\\z/', '', $host);
+
+        if (!is_string($host) || $host === '') {
+            return null;
+        }
+
+        if (strpos($host, 'www.') === 0) {
+            $host = substr($host, 4);
+        }
+
+        return $host ?: null;
+    }
+
+    private static function getAllowedHosts(): array
+    {
+        $site_host = self::normalizeHost(wp_parse_url(home_url(), PHP_URL_HOST));
+
+        $hosts = apply_filters(
+            self::$namespace . '/captcha/allowed-hosts',
+            $site_host ? [$site_host] : []
+        );
+
+        if (!is_array($hosts)) {
+            $hosts = $site_host ? [$site_host] : [];
+        }
+
+        $normalized = [];
+
+        foreach ($hosts as $host) {
+            $normalized_host = self::normalizeHost(is_string($host) ? $host : null);
+
+            if ($normalized_host) {
+                $normalized[] = $normalized_host;
+            }
+        }
+
+        return array_values(array_unique($normalized));
+    }
+
+    private static function isAllowedHost(?string $host): bool
+    {
+        $normalized_host = self::normalizeHost($host);
+
+        if (!$normalized_host) {
+            return false;
+        }
+
+        return in_array($normalized_host, self::getAllowedHosts(), true);
+    }
+
+    private static function getRequestTokenNonceAction(): string
+    {
+        return self::$namespace . '/request-token';
+    }
+
+    private static function validOrigin(): bool
+    {
+        if (empty($_SERVER['HTTP_ORIGIN'])) {
+            return false;
+        }
+
+        $origin = sanitize_text_field(wp_unslash($_SERVER['HTTP_ORIGIN']));
+
+        $origin_host = wp_parse_url($origin, PHP_URL_HOST);
+
+        if (!$origin_host) {
+            return false;
+        }
+
+        return self::isAllowedHost($origin_host);
+    }
+
     private static function validReferer(): bool
     {
-        if (!isset($_SERVER['SERVER_NAME']) || empty($_SERVER['SERVER_NAME'])) {
+        $referer = wp_get_raw_referer();
+
+        if (!$referer) {
             return false;
         }
 
-        if (!isset($_SERVER['HTTP_REFERER']) || empty($_SERVER['HTTP_REFERER'])) {
+        $referer_host = wp_parse_url($referer, PHP_URL_HOST);
+
+        if (!$referer_host) {
             return false;
         }
 
-        preg_match('/[^.]+\.[^.]+$/m', sanitize_text_field($_SERVER['SERVER_NAME']), $server_host);
+        return self::isAllowedHost($referer_host);
+    }
 
-        if (empty($server_host[0])) {
+    private static function validTokenRequest(): bool
+    {
+        $nonce_valid = check_ajax_referer(
+            self::getRequestTokenNonceAction(),
+            self::TOKEN_NONCE_FIELD,
+            false
+        );
+
+        if (!$nonce_valid) {
             return false;
         }
 
-        $parsed = parse_url(esc_url_raw($_SERVER['HTTP_REFERER']));
-
-        if ($parsed === false || !isset($parsed['host'])) {
-            return false;
-        }
-
-        preg_match('/[^.]+\.[^.]+$/m', $parsed['host'], $client_host);
-
-        if (empty($client_host[0])) {
-            return false;
-        }
-
-        if ($server_host[0] !== $client_host[0]) {
+        if (!self::validOrigin() && !self::validReferer()) {
             return false;
         }
 
         return true;
     }
 
-    public static function requestToken(): void
+    private static function clearTokenSession(): void
     {
-        if (!self::validReferer()) {
-            if (isset($_SESSION['LEXO_CAPTCHA_TOKEN'])) {
-                unset($_SESSION['LEXO_CAPTCHA_TOKEN']);
-            }
+        unset($_SESSION['LEXO_CAPTCHA_TOKEN']);
+        unset($_SESSION['LEXO_CAPTCHA_TOKEN_GENERATION_TIMESTAMP']);
+        unset($_SESSION['LEXO_CAPTCHA_TOKEN_USER_AGENT']);
+        unset($_SESSION['LEXO_CAPTCHA_TOKEN_IP']);
+    }
 
-            if (isset($_SESSION['LEXO_CAPTCHA_TOKEN_GENERATION_TIMESTAMP'])) {
-                unset($_SESSION['LEXO_CAPTCHA_TOKEN_GENERATION_TIMESTAMP']);
-            }
+    private static function getClientIp(): ?string
+    {
+        $ip = $_SERVER['REMOTE_ADDR'] ?? null;
 
-            wp_send_json_error([
-                'message' => 'Invalid request origin'
-            ]);
+        $ip = apply_filters(self::$namespace . '/captcha/client-ip', $ip);
+
+        if (!is_string($ip)) {
+            return null;
         }
 
-        $_SESSION['LEXO_CAPTCHA_TOKEN_GENERATION_TIMESTAMP'] = self::getTimestamp();
+        $ip = trim($ip);
 
-        $_SESSION['LEXO_CAPTCHA_TOKEN'] = hash('SHA256', $_SESSION['LEXO_CAPTCHA_TOKEN_GENERATION_TIMESTAMP']);
+        if ($ip === '') {
+            return null;
+        }
+
+        $validated = filter_var($ip, FILTER_VALIDATE_IP);
+
+        if ($validated === false) {
+            return null;
+        }
+
+        return $validated;
+    }
+
+    public static function requestToken(): void
+    {
+        if ('POST' !== ($_SERVER['REQUEST_METHOD'] ?? '')) {
+            self::clearTokenSession();
+
+            wp_send_json_error(
+                [
+                    'message' => 'Invalid request method',
+                ],
+                405
+            );
+        }
+
+        if (!self::validTokenRequest()) {
+            self::clearTokenSession();
+
+            wp_send_json_error(
+                [
+                    'message' => 'Invalid request context',
+                ],
+                403
+            );
+        }
+
+        $timestamp = self::getTimestamp();
+
+        self::clearTokenSession();
+
+        $_SESSION['LEXO_CAPTCHA_TOKEN_GENERATION_TIMESTAMP'] = $timestamp;
+
+        $token = wp_generate_password(64, false);
+
+        $_SESSION['LEXO_CAPTCHA_TOKEN'] = $token;
+
+        if (!empty($_SERVER['HTTP_USER_AGENT'])) {
+            $_SESSION['LEXO_CAPTCHA_TOKEN_USER_AGENT'] = sanitize_text_field(
+                wp_unslash($_SERVER['HTTP_USER_AGENT'])
+            );
+        }
+
+        $client_ip = self::getClientIp();
+
+        if ($client_ip) {
+            $_SESSION['LEXO_CAPTCHA_TOKEN_IP'] = $client_ip;
+        }
 
         wp_send_json_success([
-            'token' => $_SESSION['LEXO_CAPTCHA_TOKEN']
+            'token'      => $token,
+            'next_nonce' => wp_create_nonce(self::getRequestTokenNonceAction()),
         ]);
     }
 
@@ -373,7 +530,7 @@ class PluginService extends Singleton
             $data = sanitize_text_field($_POST['lexo_captcha_data']);
         }
 
-        $data = json_decode(stripslashes($data), true);
+        $decoded = json_decode(stripslashes($data), true);
 
         $timestamp = self::getTimestamp();
 
@@ -386,6 +543,24 @@ class PluginService extends Singleton
             'lexo_captcha_evaluations',
             $evaluations + 1,
         );
+
+        if (!is_array($decoded)) {
+            self::appendStatistics(
+                'invalid-payload',
+                $timestamp,
+                null,
+                null,
+                $_SESSION['LEXO_CAPTCHA_TOKEN'] ?? null,
+                $_SESSION['LEXO_CAPTCHA_TOKEN_GENERATION_TIMESTAMP'] ?? null,
+                [
+                    'json_error' => json_last_error_msg(),
+                ]
+            );
+
+            return false;
+        }
+
+        $data = $decoded;
 
         if (!self::validReferer()) {
             self::appendStatistics(
@@ -403,7 +578,7 @@ class PluginService extends Singleton
             return false;
         }
 
-        if (!isset($data['interacted'])) {
+        if (!array_key_exists('interacted', $data)) {
             self::appendStatistics(
                 'interaction-data-missing',
                 $timestamp,
@@ -416,12 +591,40 @@ class PluginService extends Singleton
             return false;
         }
 
-        if (!isset($data['token'])) {
+        if (!is_numeric($data['interacted'])) {
+            self::appendStatistics(
+                'interaction-data-invalid',
+                $timestamp,
+                null,
+                $data['token'] ?? null,
+                $_SESSION['LEXO_CAPTCHA_TOKEN'] ?? null,
+                $_SESSION['LEXO_CAPTCHA_TOKEN_GENERATION_TIMESTAMP'] ?? null,
+            );
+
+            return false;
+        }
+
+        $interaction = (float) $data['interacted'];
+
+        if (!array_key_exists('token', $data)) {
             self::appendStatistics(
                 'token-missing',
                 $timestamp,
-                $data['interacted'],
+                $interaction,
                 null,
+                $_SESSION['LEXO_CAPTCHA_TOKEN'] ?? null,
+                $_SESSION['LEXO_CAPTCHA_TOKEN_GENERATION_TIMESTAMP'] ?? null,
+            );
+
+            return false;
+        }
+
+        if (!is_string($data['token']) || $data['token'] === '') {
+            self::appendStatistics(
+                'token-invalid',
+                $timestamp,
+                $interaction,
+                is_scalar($data['token']) ? (string) $data['token'] : null,
                 $_SESSION['LEXO_CAPTCHA_TOKEN'] ?? null,
                 $_SESSION['LEXO_CAPTCHA_TOKEN_GENERATION_TIMESTAMP'] ?? null,
             );
@@ -433,7 +636,7 @@ class PluginService extends Singleton
             self::appendStatistics(
                 'no-token-requested',
                 $timestamp,
-                $data['interacted'],
+                $interaction,
                 $data['token'],
                 $_SESSION['LEXO_CAPTCHA_TOKEN'] ?? null,
                 $_SESSION['LEXO_CAPTCHA_TOKEN_GENERATION_TIMESTAMP'] ?? null,
@@ -442,17 +645,18 @@ class PluginService extends Singleton
             return false;
         }
 
-        $captcha_token = $_SESSION['LEXO_CAPTCHA_TOKEN'];
-        $captcha_token_generation_timestamp = $_SESSION['LEXO_CAPTCHA_TOKEN_GENERATION_TIMESTAMP'];
+        $captcha_token = (string) $_SESSION['LEXO_CAPTCHA_TOKEN'];
+        $captcha_token_generation_timestamp = (float) $_SESSION['LEXO_CAPTCHA_TOKEN_GENERATION_TIMESTAMP'];
+        $captcha_token_user_agent = $_SESSION['LEXO_CAPTCHA_TOKEN_USER_AGENT'] ?? null;
+        $captcha_token_ip = $_SESSION['LEXO_CAPTCHA_TOKEN_IP'] ?? null;
 
-        unset($_SESSION['LEXO_CAPTCHA_TOKEN']);
-        unset($_SESSION['LEXO_CAPTCHA_TOKEN_GENERATION_TIMESTAMP']);
+        self::clearTokenSession();
 
-        if ($data['token'] !== $captcha_token) {
+        if (!hash_equals($captcha_token, $data['token'])) {
             self::appendStatistics(
                 'invalid-token',
                 $timestamp,
-                $data['interacted'],
+                $interaction,
                 $data['token'],
                 $captcha_token,
                 $captcha_token_generation_timestamp,
@@ -461,18 +665,56 @@ class PluginService extends Singleton
             return false;
         }
 
-        // client timestamp tolerance = 300000ms = 300s
+        $current_user_agent = !empty($_SERVER['HTTP_USER_AGENT'])
+            ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT']))
+            : null;
+
+        if ($captcha_token_user_agent && $current_user_agent !== $captcha_token_user_agent) {
+            self::appendStatistics(
+                'token-user-agent-mismatch',
+                $timestamp,
+                $interaction,
+                $data['token'],
+                $captcha_token,
+                $captcha_token_generation_timestamp,
+                [
+                    'expected_user_agent' => $captcha_token_user_agent,
+                    'received_user_agent' => $current_user_agent,
+                ]
+            );
+
+            return false;
+        }
+
+        $current_ip = self::getClientIp();
+
+        if ($captcha_token_ip && $current_ip !== $captcha_token_ip) {
+            self::appendStatistics(
+                'token-ip-mismatch',
+                $timestamp,
+                $interaction,
+                $data['token'],
+                $captcha_token,
+                $captcha_token_generation_timestamp,
+                [
+                    'expected_ip' => $captcha_token_ip,
+                    'received_ip' => $current_ip,
+                ]
+            );
+
+            return false;
+        }
 
         $timestamp_tolerance = apply_filters(
             self::$namespace . '/captcha/client-timestamp-tolerance',
             300000,
         );
 
-        if ($data['interacted'] > $timestamp + $timestamp_tolerance) {
+        if ($interaction > $timestamp + $timestamp_tolerance) {
             self::appendStatistics(
                 'interaction-data-future',
                 $timestamp,
-                $data['interacted'],
+                $interaction,
                 $data['token'],
                 $captcha_token,
                 $captcha_token_generation_timestamp,
@@ -481,12 +723,11 @@ class PluginService extends Singleton
             return false;
         }
 
-        // Form sent within 15 seconds since token generation.
         if ($timestamp - $captcha_token_generation_timestamp < self::$submit_cooldown) {
             self::appendStatistics(
                 'early-submit',
                 $timestamp,
-                $data['interacted'],
+                $interaction,
                 $data['token'],
                 $captcha_token,
                 $captcha_token_generation_timestamp,
@@ -499,24 +740,21 @@ class PluginService extends Singleton
             return false;
         }
 
-        // 3600000ms = 1h
-
         $max_interaction_age = apply_filters(
             self::$namespace . '/captcha/max-interaction-age',
             3600000,
         );
 
-        // First interacted over an hour ago.
-        if ($timestamp - $data['interacted'] > $max_interaction_age) {
+        if ($timestamp - $interaction > $max_interaction_age) {
             self::appendStatistics(
                 'interaction-data-expired',
                 $timestamp,
-                $data['interacted'],
+                $interaction,
                 $data['token'],
                 $captcha_token,
                 $captcha_token_generation_timestamp,
                 [
-                    'interaction_age' => $timestamp - $data['interacted'],
+                    'interaction_age' => $timestamp - $interaction,
                     'interaction_max_age' => $max_interaction_age,
                 ],
             );
@@ -529,12 +767,11 @@ class PluginService extends Singleton
             3600000,
         );
 
-        // Token generated over an hour ago.
         if ($timestamp - $captcha_token_generation_timestamp > $max_token_age) {
             self::appendStatistics(
                 'expired-token',
                 $timestamp,
-                $data['interacted'],
+                $interaction,
                 $data['token'],
                 $captcha_token,
                 $captcha_token_generation_timestamp,
@@ -567,10 +804,20 @@ class PluginService extends Singleton
                 return __('No token requested.', 'lexocaptcha');
             case 'token-missing':
                 return __('Token missing.', 'lexocaptcha');
+            case 'token-invalid':
+                return __('Token invalid.', 'lexocaptcha');
+            case 'token-user-agent-mismatch':
+                return __('Token does not match the requesting browser.', 'lexocaptcha');
+            case 'token-ip-mismatch':
+                return __('Token does not match the requesting IP address.', 'lexocaptcha');
             case 'interaction-data-missing':
                 return __('Interaction data missing.', 'lexocaptcha');
+            case 'interaction-data-invalid':
+                return __('Interaction data invalid.', 'lexocaptcha');
             case 'invalid-referer-host':
                 return __('Missing referer or invalid referer host.', 'lexocaptcha');
+            case 'invalid-payload':
+                return __('Captcha payload is malformed.', 'lexocaptcha');
         }
 
         return $reason;

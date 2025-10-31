@@ -50,6 +50,18 @@ Requesting a token in the frontend can be done using the `LEXO_Captcha.requestTo
 - `$max_age` (`int`) The amount of time in ms before the requested token expires.
 - Default is `3600000`.
 
+#### - `lexocaptcha/captcha/allowed-hosts`
+*Parameters*
+`apply_filters('lexocaptcha/captcha/allowed-hosts', $hosts);`
+- `$hosts` (`array`) List of hostnames allowed to request or submit captcha tokens.
+- Defaults to an array containing the site's host only.
+
+#### - `lexocaptcha/captcha/client-ip`
+*Parameters*
+`apply_filters('lexocaptcha/captcha/client-ip', $ip);`
+- `$ip` (`string|null`) The IP address associated with the captcha token.
+- Default is the sanitized value of `$_SERVER['REMOTE_ADDR']` or `null` if unavailable.
+
 ---
 ### Loader
 

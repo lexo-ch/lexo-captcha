@@ -40,6 +40,7 @@ window.LEXO_Captcha = new (class {
 		const data = new FormData();
 
 		data.append('action', 'lexo_captcha_request_token');
+    data.append('token_nonce', lexocaptchaFrontLocalized.token_nonce || '');
 
 		this.#token_ready = new Promise(async (resolve, reject) => {
 			const response = await fetch(lexocaptchaFrontLocalized.ajax_url, {
@@ -48,6 +49,10 @@ window.LEXO_Captcha = new (class {
 			});
 
       const result = await response.json();
+
+      if (result?.data?.next_nonce) {
+        lexocaptchaFrontLocalized.token_nonce = result.data.next_nonce;
+      }
 
 			if (result && result.success) {
         localStorage.setItem('lexo_captcha_token', result.data.token);
