@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: LEXO Captcha\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-30 15:16+0000\n"
+"POT-Creation-Date: 2025-10-31 13:07+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -16,13 +16,17 @@ msgstr ""
 "X-Loco-Version: 2.7.2; wp-6.8.1\n"
 "X-Domain: lexocaptcha"
 
-#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:188
+#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:193
 #, php-format
 msgid "%s Statistics"
 msgstr ""
 
 #: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/Pages/StatisticsPage.php:122
 msgid "Additional Data"
+msgstr ""
+
+#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:820
+msgid "Captcha payload is malformed."
 msgstr ""
 
 #: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/Pages/StatisticsPage.php:49
@@ -37,7 +41,7 @@ msgstr ""
 msgid "Expected Token:"
 msgstr ""
 
-#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:554
+#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:794
 msgid "Expired token."
 msgstr ""
 
@@ -53,19 +57,23 @@ msgstr ""
 msgid "https://www.lexo.ch"
 msgstr ""
 
-#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:556
+#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:796
 msgid "Interaction data expired."
 msgstr ""
 
-#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:560
+#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:800
 msgid "Interaction data from the future, likely faked."
 msgstr ""
 
-#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:568
+#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:816
+msgid "Interaction data invalid."
+msgstr ""
+
+#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:814
 msgid "Interaction data missing."
 msgstr ""
 
-#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:562
+#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:802
 msgid "Invalid token."
 msgstr ""
 
@@ -81,15 +89,15 @@ msgstr ""
 msgid "LEXO GmbH"
 msgstr ""
 
-#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:570
+#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:818
 msgid "Missing referer or invalid referer host."
 msgstr ""
 
-#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:564
+#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:804
 msgid "No token requested."
 msgstr ""
 
-#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:73
+#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:74
 #, php-format
 msgid "Plugin %s is up to date."
 msgstr ""
@@ -102,7 +110,7 @@ msgstr ""
 msgid "Referer:"
 msgstr ""
 
-#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:64
+#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:65
 msgid "Security check failed."
 msgstr ""
 
@@ -114,12 +122,20 @@ msgstr ""
 msgid "Spam Quota:"
 msgstr ""
 
-#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:124
+#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:129
 msgid "Statistics"
 msgstr ""
 
-#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:558
+#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:798
 msgid "Submitted too early."
+msgstr ""
+
+#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:810
+msgid "Token does not match the requesting browser."
+msgstr ""
+
+#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:812
+msgid "Token does not match the requesting IP address."
 msgstr ""
 
 #: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/Pages/StatisticsPage.php:112
@@ -130,7 +146,11 @@ msgstr ""
 msgid "Token Given by Client:"
 msgstr ""
 
-#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:566
+#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:808
+msgid "Token invalid."
+msgstr ""
+
+#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:806
 msgid "Token missing."
 msgstr ""
 
@@ -138,7 +158,7 @@ msgstr ""
 msgid "Total Evaluations:"
 msgstr ""
 
-#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:121
+#: ../../../../../../../Documents/GitHub/lexo-captcha/src/Core/PluginService.php:126
 msgid "Update check"
 msgstr ""
 
