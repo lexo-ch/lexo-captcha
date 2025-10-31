@@ -1,3 +1,11 @@
+## [2.0.8](https://github.com/lexo-ch/lexo-captcha/compare/v2.0.7...v2.0.8) (2025-10-31)
+
+
+### Bug Fixes
+
+* **core:** Add token nonce and optimise the code ([502bcd4](https://github.com/lexo-ch/lexo-captcha/commit/502bcd4326c44418dcd1c6b472173b27951dcb70))
+* **translations:** Add new translations ([b0dffc2](https://github.com/lexo-ch/lexo-captcha/commit/b0dffc23df00bfd08a4c08f6b91a2cb4b79451d8))
+
 ## [2.0.7](https://github.com/lexo-ch/lexo-captcha/compare/v2.0.6...v2.0.7) (2025-10-29)
 
 
