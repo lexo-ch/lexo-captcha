@@ -100,7 +100,6 @@ class PluginService extends Singleton
             'min_wp_version'    => MIN_WP_VERSION,
             'text_domain'       => DOMAIN,
             'ajax_url'          => admin_url('admin-ajax.php'),
-            'token_nonce'       => wp_create_nonce(self::getRequestTokenNonceAction()),
             'submit_cooldown'   => self::$submit_cooldown,
         ];
 
@@ -407,6 +406,31 @@ class PluginService extends Singleton
         return $validated;
     }
 
+    public static function requestNonce(): void
+    {
+        if ('POST' !== ($_SERVER['REQUEST_METHOD'] ?? '')) {
+            wp_send_json_error(
+                [
+                    'message' => 'Invalid request method',
+                ],
+                405
+            );
+        }
+
+        if (!self::validOrigin() && !self::validReferer()) {
+            wp_send_json_error(
+                [
+                    'message' => 'Invalid request context',
+                ],
+                403
+            );
+        }
+
+        wp_send_json_success([
+            'nonce' => wp_create_nonce(self::getRequestTokenNonceAction()),
+        ]);
+    }
+
     public static function requestToken(): void
     {
         if ('POST' !== ($_SERVER['REQUEST_METHOD'] ?? '')) {
@@ -461,6 +485,16 @@ class PluginService extends Singleton
 
     public static function addAjaxRoutes(): void
     {
+        add_action(
+            'wp_ajax_lexo_captcha_request_nonce',
+            [self::class, 'requestNonce'],
+        );
+
+        add_action(
+            'wp_ajax_nopriv_lexo_captcha_request_nonce',
+            [self::class, 'requestNonce'],
+        );
+
         add_action(
             'wp_ajax_lexo_captcha_request_token',
             [self::class, 'requestToken'],
