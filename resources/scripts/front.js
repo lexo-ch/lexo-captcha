@@ -27,12 +27,59 @@ window.LEXO_Captcha = new (class {
      */
 	#token_ready = null;
 
+  /**
+     * @type {Promise?}
+     */
+  #nonce_ready = null;
+
+  async requestNonce() {
+    if (this.#nonce_ready) {
+      await this.#nonce_ready;
+
+      return;
+    }
+
+    this.#nonce_ready = new Promise(async (resolve, reject) => {
+      const data = new FormData();
+
+      data.append('action', 'lexo_captcha_request_nonce');
+
+      try {
+        const response = await fetch(lexocaptchaFrontLocalized.ajax_url, {
+          method: 'POST',
+          body: data,
+        });
+
+        const result = await response.json();
+
+        if (result && result.success && result.data?.nonce) {
+          lexocaptchaFrontLocalized.token_nonce = result.data.nonce;
+          resolve();
+        } else {
+          console.error('Failed to get nonce:', result.data?.message);
+          reject(new Error(result.data?.message || 'Nonce request failed'));
+        }
+      } catch (error) {
+        console.error('Nonce request error:', error);
+        reject(error);
+      }
+
+      this.#nonce_ready = null;
+    });
+
+    await this.#nonce_ready;
+  }
+
 	async requestToken() {
 		if (this.#token_ready) {
 			await this.#token_ready;
 
 			return;
 		}
+
+    if (!lexocaptchaFrontLocalized.token_nonce) {
+      await this.requestNonce();
+    }
 
 		localStorage.removeItem('lexo_captcha_token');
 		localStorage.removeItem('lexo_captcha_token_recieval_timestamp');
