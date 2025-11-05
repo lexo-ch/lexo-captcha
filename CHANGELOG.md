@@ -1,3 +1,10 @@
+## [2.0.9](https://github.com/lexo-ch/lexo-captcha/compare/v2.0.8...v2.0.9) (2025-11-05)
+
+
+### Bug Fixes
+
+* **core:** Request nonce via Ajax ([9e6161c](https://github.com/lexo-ch/lexo-captcha/commit/9e6161cdd535795adef5f784f2b197c83b854661))
+
 ## [2.0.8](https://github.com/lexo-ch/lexo-captcha/compare/v2.0.7...v2.0.8) (2025-10-31)
 
 
