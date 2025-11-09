@@ -1,3 +1,11 @@
+## [2.1.1](https://github.com/lexo-ch/lexo-captcha/compare/v2.1.0...v2.1.1) (2025-11-09)
+
+
+### Bug Fixes
+
+* **core:** Do not serialize lchp field ([666fd08](https://github.com/lexo-ch/lexo-captcha/commit/666fd08ce7a47a97d3c67b2ce146c5ab2211c5ff))
+* **core:** Fix typo ([9d07ace](https://github.com/lexo-ch/lexo-captcha/commit/9d07ace73949de8f6d1858455bfc1e46201f0c2b))
+
 # [2.1.0](https://github.com/lexo-ch/lexo-captcha/compare/v2.0.9...v2.1.0) (2025-11-09)
 
 
