@@ -244,7 +244,7 @@ window.LEXO_Captcha = new (class {
       // Add a label to make it look legitimate to bots
       const label = document.createElement('label');
       label.htmlFor = this.#lchp_field;
-      label.textContent = 'This field is requried.';
+      label.textContent = 'This field is required.';
 
       wrapper.appendChild(label);
       wrapper.appendChild(input);
