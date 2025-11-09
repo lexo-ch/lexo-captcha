@@ -1,3 +1,10 @@
+## [2.1.2](https://github.com/lexo-ch/lexo-captcha/compare/v2.1.1...v2.1.2) (2025-11-09)
+
+
+### Bug Fixes
+
+* **core:** Fix js error ([e477d4f](https://github.com/lexo-ch/lexo-captcha/commit/e477d4f1120d3d5828724f6c762159140a09c656))
+
 ## [2.1.1](https://github.com/lexo-ch/lexo-captcha/compare/v2.1.0...v2.1.1) (2025-11-09)
 
 
