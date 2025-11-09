@@ -4,6 +4,22 @@ window.LEXO_Captcha = new (class {
 	 */
 	#interacted = null;
 
+  /**
+   * @type {string?}
+   */
+  #lchp_field = null;
+
+  /**
+   * Behavioral tracking data
+   */
+  #behavior = {
+    mouse_moves: 0,
+    mouse_positions: [],
+    key_presses: 0,
+    scroll_events: 0,
+    start_time: Date.now(),
+  };
+
 	#interaction_events = [
 		'keydown',
 		'mousemove',
@@ -21,6 +37,78 @@ window.LEXO_Captcha = new (class {
 			document.removeEventListener(interaction_event, this.#record_interaction);
 		}
 	};
+
+  /**
+   * Track mouse movements for behavioral analysis
+   */
+  #track_mouse_move = (event) => {
+    this.#behavior.mouse_moves++;
+
+    // Sample mouse positions (max 50 to avoid excessive data)
+    if (this.#behavior.mouse_positions.length < 50) {
+      this.#behavior.mouse_positions.push({
+        x: event.clientX,
+        y: event.clientY,
+        time: Date.now()
+      });
+    }
+  };
+
+  /**
+   * Track keyboard events
+   */
+  #track_key_press = () => {
+    this.#behavior.key_presses++;
+  };
+
+  /**
+   * Track scroll events
+   */
+  #track_scroll = () => {
+    this.#behavior.scroll_events++;
+  };
+
+  /**
+   * Calculate mouse movement variance (bots have linear paths)
+   */
+  #calculate_mouse_variance = () => {
+    if (this.#behavior.mouse_positions.length < 2) {
+      return 0;
+    }
+
+    const positions = this.#behavior.mouse_positions;
+    let total_variance = 0;
+
+    for (let i = 1; i < positions.length; i++) {
+      const dx = positions[i].x - positions[i - 1].x;
+      const dy = positions[i].y - positions[i - 1].y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      total_variance += distance;
+    }
+
+    return total_variance / positions.length;
+  };
+
+  /**
+   * Collect browser fingerprint data
+   */
+  #collect_fingerprint = () => {
+    const screen_data = `${window.screen.width}x${window.screen.height}x${window.screen.colorDepth}`;
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const language = navigator.language || navigator.userLanguage;
+    const platform = navigator.platform;
+
+    // Hardware concurrency (CPU cores)
+    const hardware = navigator.hardwareConcurrency || 'unknown';
+
+    return {
+      screen: screen_data,
+      timezone: timezone,
+      language: language,
+      platform: platform,
+      hardware: hardware.toString(),
+    };
+  };
 
 	/**
      * @type {Promise?}
@@ -104,6 +192,12 @@ window.LEXO_Captcha = new (class {
 			if (result && result.success) {
         localStorage.setItem('lexo_captcha_token', result.data.token);
         localStorage.setItem('lexo_captcha_token_recieval_timestamp', Date.now());
+
+        if (result.data.lchp_field) {
+          this.#lchp_field = result.data.lchp_field;
+          this.#inject_lchp_fields();
+        }
+
         resolve();
       } else {
         console.error('Failed to get token:', result.data?.message);
@@ -115,6 +209,49 @@ window.LEXO_Captcha = new (class {
 
 		await this.#token_ready;
 	}
+
+  #inject_lchp_fields() {
+    if (!this.#lchp_field) {
+      return;
+    }
+
+    const forms = document.querySelectorAll('form[data-action]');
+
+    for (const form of forms) {
+      const existing = form.querySelector('.lchp-form-field');
+      if (existing) {
+        existing.name = this.#lchp_field;
+        existing.id = this.#lchp_field;
+        continue;
+      }
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lchp-form-field';
+      wrapper.setAttribute('aria-hidden', 'true');
+      wrapper.style.cssText = 'position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;';
+
+      // Create the actual input field
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.name = this.#lchp_field;
+      input.id = this.#lchp_field;
+      input.classList.add('send_field');
+      input.value = '';
+      input.tabIndex = -1;
+      input.autocomplete = 'off';
+      input.setAttribute('aria-hidden', 'true');
+
+      // Add a label to make it look legitimate to bots
+      const label = document.createElement('label');
+      label.htmlFor = this.#lchp_field;
+      label.textContent = 'This field is requried.';
+
+      wrapper.appendChild(label);
+      wrapper.appendChild(input);
+
+      form.insertBefore(wrapper, form.firstChild);
+    }
+  }
 
 	#request_submit() {
 		return new Promise(async resolve => {
@@ -136,9 +273,28 @@ window.LEXO_Captcha = new (class {
 	async compileData() {
 		await this.#request_submit();
 
+    // Compile behavioral data
+    const behavior_data = {
+      mouse_moves: this.#behavior.mouse_moves,
+      mouse_variance: this.#calculate_mouse_variance(),
+      key_presses: this.#behavior.key_presses,
+      scroll_events: this.#behavior.scroll_events,
+      interaction_duration: Date.now() - this.#behavior.start_time,
+    };
+
+    const lchp_data = {};
+    if (this.#lchp_field) {
+      // Try to find the lchp field in the DOM
+      const lchp_input = document.querySelector(`input[name="${this.#lchp_field}"]`);
+      lchp_data[this.#lchp_field] = lchp_input ? lchp_input.value : '';
+    }
+
 		const data = JSON.stringify({
 			'interacted': this.#interacted,
 			'token': localStorage.getItem('lexo_captcha_token'),
+      'fingerprint': this.#collect_fingerprint(),
+      'behavior': behavior_data,
+      'lchp': lchp_data,
 		});
 
 		localStorage.removeItem('lexo_captcha_token');
@@ -148,11 +304,17 @@ window.LEXO_Captcha = new (class {
 	}
 
 	/**
-	 * @param {string} message
+	 * @param {string|object} message
 	 */
   #notify(message, $success = true) {
-		if (!message.length) {
-			message = 'Error: Message not send! Please try again.';
+    // Handle object responses (e.g., error responses with message property)
+    if (typeof message === 'object' && message !== null) {
+      message = message.message || 'Error: Message not sent! Please try again.';
+    }
+
+    // Ensure message is a string
+    if (typeof message !== 'string' || !message.length) {
+      message = 'Error: Message not sent! Please try again.';
 		}
 
 		const notification = document.createElement('div');
@@ -239,6 +401,8 @@ window.LEXO_Captcha = new (class {
 		let spam = false;
 
 		this.#add_form_events(form);
+
+    this.#inject_lchp_fields();
 
 		jQuery(form).validate({
 			errorElement: 'span',
@@ -347,6 +511,8 @@ window.LEXO_Captcha = new (class {
 
 		this.#add_form_events(form);
 
+    this.#inject_lchp_fields();
+
 		jQuery(form).validate({
 			errorElement: 'span',
 			wrapper: 'em',
@@ -445,9 +611,15 @@ window.LEXO_Captcha = new (class {
       return this.optional(element) || /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(value);
     };
 
+    // Set up interaction event listeners
 		for (const interaction_event of this.#interaction_events) {
 			document.addEventListener(interaction_event, this.#record_interaction);
 		}
+
+    // Set up behavioral tracking event listeners
+    document.addEventListener('mousemove', this.#track_mouse_move);
+    document.addEventListener('keydown', this.#track_key_press);
+    document.addEventListener('scroll', this.#track_scroll, { passive: true });
 
 		this.requestToken();
 
