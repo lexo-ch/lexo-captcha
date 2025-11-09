@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/lexo-ch/lexo-captcha/compare/v2.0.9...v2.1.0) (2025-11-09)
+
+
+### Features
+
+* **core:** Add honeypot and behavioral analysis ([abf4ef0](https://github.com/lexo-ch/lexo-captcha/commit/abf4ef0383566f679e34d40071a1b90083818ef8))
+
 ## [2.0.9](https://github.com/lexo-ch/lexo-captcha/compare/v2.0.8...v2.0.9) (2025-11-05)
 
 

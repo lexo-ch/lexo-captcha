@@ -4,7 +4,7 @@
  * Plugin Name:       LEXO Captcha
  * Plugin URI:        https://github.com/lexo-ch/lexo-captcha/
  * Description:       LEXO Captcha solution.
- * Version:           2.0.9
+ * Version:           2.1.0
  * Requires at least: 6.4
  * Requires PHP:      7.4.1
  * Author:            LEXO GmbH
