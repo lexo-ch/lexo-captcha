@@ -268,7 +268,7 @@ window.LEXO_Captcha = new (class {
 		});
 	}
 
-	async compileData() {
+  async compileData(formContext = null) {
 		await this.#request_submit();
 
     // Compile behavioral data
@@ -282,9 +282,11 @@ window.LEXO_Captcha = new (class {
 
     const lchp_data = {};
     if (this.#lchp_field) {
-      // Try to find the lchp field in the DOM
-      const lchp_input = document.querySelector(`input[name="${this.#lchp_field}"]`);
-      lchp_data[this.#lchp_field] = lchp_input ? lchp_input.value : '';
+      const searchContext = formContext || document;
+      const lchp_input = searchContext.querySelector(`input[name="${this.#lchp_field}"]`);
+      const lchp_value = lchp_input ? lchp_input.value : '';
+
+      lchp_data[this.#lchp_field] = lchp_value;
     }
 
 		const data = JSON.stringify({
@@ -449,7 +451,7 @@ window.LEXO_Captcha = new (class {
 
 				body.append(
 					'lexo_captcha_data',
-					await this.compileData(),
+          await this.compileData(form),
 				);
 
 				const response = await (await fetch(lexocaptchaFrontLocalized.ajax_url, {
@@ -551,7 +553,7 @@ window.LEXO_Captcha = new (class {
 
 				body.append(
 					'lexo_captcha_data',
-					await this.compileData(),
+          await this.compileData(form),
 				);
 
 				const response = await (await fetch(lexocaptchaFrontLocalized.ajax_url, {
