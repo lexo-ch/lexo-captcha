@@ -235,16 +235,14 @@ window.LEXO_Captcha = new (class {
       input.type = 'text';
       input.name = this.#lchp_field;
       input.id = this.#lchp_field;
-      input.classList.add('send_field');
       input.value = '';
       input.tabIndex = -1;
       input.autocomplete = 'off';
       input.setAttribute('aria-hidden', 'true');
 
-      // Add a label to make it look legitimate to bots
       const label = document.createElement('label');
       label.htmlFor = this.#lchp_field;
-      label.textContent = 'This field is requried.';
+      label.textContent = 'This field is required.';
 
       wrapper.appendChild(label);
       wrapper.appendChild(input);
