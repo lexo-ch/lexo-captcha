@@ -22,6 +22,17 @@ LEXO Captcha attempts to prevent spam using tokens and the limitations surroundi
 
 Requesting a token in the frontend can be done using the `LEXO_Captcha.requestToken()` method. LEXO Captcha will do this automatically on page load. Using `LEXO_Captcha.compileData()` (should be awaited), you can generate a JSON string containing data necessary for evaluation. Pass this data on (POST) to the backend with your form submissions, preferrably as the property `"lexo_captcha_data"` in your request body. In the backend, use `lexo_captcha_evaluate_data()` to evaluate the captcha data. The method will consume the token and return `true` if the data is valid, and `false` otherwise. By default, `lexo_captcha_evaluate_data()` pulls the captcha data from `$_POST['lexo_captcha_data']`, but if you would like, you can pass the data on yourself like so: `lexo_captcha_evaluate_data($data)`. This function returns `bool` value. Once the backend responds, in the frontend, you should request a new token (since the old one has been consumed) for the next form submission.
 
+### Advanced Bot Detection Features
+LEXO Captcha includes multiple layers of bot detection:
+
+- **Honeypot Fields**: Hidden form fields that are invisible to users but visible to bots. Bots that auto-fill these fields are automatically rejected.
+- **Behavioral Analysis**: Tracks genuine human interaction patterns including mouse movements, mouse variance, keyboard events, scroll behavior, and interaction timing. Submissions must achieve a minimum "human score" to pass (default: 40%).
+- **Browser Fingerprinting**: Collects and validates unique browser characteristics (screen resolution, timezone, language, platform, CPU cores) to detect session hijacking and bot rotation.
+- **HMAC Signature Validation**: Cryptographically signs timestamps to prevent tampering.
+- **Device Binding**: Validates that the IP address and User-Agent remain consistent throughout the token lifecycle.
+
+All validation failures are logged in the Statistics page (Settings → LEXO Captcha Statistics) with detailed rejection reasons for monitoring bot activity.
+
 ---
 ## Filters
 ### Captcha
@@ -61,6 +72,17 @@ Requesting a token in the frontend can be done using the `LEXO_Captcha.requestTo
 `apply_filters('lexocaptcha/captcha/client-ip', $ip);`
 - `$ip` (`string|null`) The IP address associated with the captcha token.
 - Default is the sanitized value of `$_SERVER['REMOTE_ADDR']` or `null` if unavailable.
+
+#### - `lexocaptcha/captcha/behavior-score-threshold`
+*Parameters*
+`apply_filters('lexocaptcha/captcha/behavior-score-threshold', $threshold);`
+- `$threshold` (`int`) The minimum behavioral analysis score (0-100) required to pass validation. Higher values are stricter.
+- Default is `40` (40% human-like behavior required).
+- Behavioral analysis tracks: mouse movements, mouse variance, keyboard events, scroll events, and interaction duration.
+- **Recommended values:**
+  - `30-40`: Balanced (recommended for most sites)
+  - `50-60`: Strict (may block some mobile users)
+  - `20-30`: Lenient (better accessibility, may allow some bots)
 
 ---
 ### Loader

@@ -379,6 +379,154 @@ class PluginService extends Singleton
         unset($_SESSION['LEXO_CAPTCHA_TOKEN_GENERATION_TIMESTAMP']);
         unset($_SESSION['LEXO_CAPTCHA_TOKEN_USER_AGENT']);
         unset($_SESSION['LEXO_CAPTCHA_TOKEN_IP']);
+        unset($_SESSION['LEXO_CAPTCHA_INTERACTION_SIGNATURE']);
+        unset($_SESSION['LEXO_CAPTCHA_LCHP_FIELD']);
+        unset($_SESSION['LEXO_CAPTCHA_FINGERPRINT']);
+    }
+
+    private static function generateLchpField(): string
+    {
+        $prefixes = ['email', 'phone', 'website', 'company', 'address', 'name'];
+        $suffixes = ['field', 'input', 'data', 'info', 'value', 'text'];
+
+        $prefix = $prefixes[array_rand($prefixes)];
+        $suffix = $suffixes[array_rand($suffixes)];
+        $random = substr(md5(wp_generate_password(12, false)), 0, 6);
+
+        return $prefix . '_' . $suffix . '_' . $random;
+    }
+
+    /**
+     * Validate browser fingerprint data
+     *
+     * @param array $fingerprint Client fingerprint data
+     * @param string|null $stored_fingerprint Stored fingerprint hash
+     * @return bool True if valid, false otherwise
+     */
+    private static function validateFingerprint(
+        array $fingerprint,
+        ?string $stored_fingerprint
+    ): bool {
+        // If no stored fingerprint, allow (backwards compatibility)
+        if (!$stored_fingerprint) {
+            return true;
+        }
+
+        // Required fingerprint fields
+        $required_fields = ['screen', 'timezone', 'language', 'platform'];
+
+        foreach ($required_fields as $field) {
+            if (empty($fingerprint[$field])) {
+                return false;
+            }
+        }
+
+        // Generate fingerprint hash from client data
+        $fingerprint_string = implode('|', [
+            $fingerprint['screen'] ?? '',
+            $fingerprint['timezone'] ?? '',
+            $fingerprint['language'] ?? '',
+            $fingerprint['platform'] ?? '',
+            $fingerprint['hardware'] ?? '',
+        ]);
+
+        $computed_hash = hash('sha256', $fingerprint_string);
+
+        return hash_equals($stored_fingerprint, $computed_hash);
+    }
+
+    /**
+     * Validate behavioral analysis data
+     *
+     * @param array $behavior Behavioral data from client
+     * @return array Validation result with score and details
+     */
+    private static function validateBehavior(array $behavior): array
+    {
+        $score = 0;
+        $max_score = 100;
+        $flags = [];
+
+        // Check mouse movement entropy (humans have varied movement)
+        if (isset($behavior['mouse_moves'])) {
+            $mouse_moves = (int) $behavior['mouse_moves'];
+
+            if ($mouse_moves === 0) {
+                $flags[] = 'no-mouse-movement';
+            } elseif ($mouse_moves < 3) {
+                $flags[] = 'minimal-mouse-movement';
+                $score += 10; // Suspicious but not definitive
+            } elseif ($mouse_moves >= 3 && $mouse_moves < 50) {
+                $score += 40; // Normal human range
+            } elseif ($mouse_moves >= 50) {
+                $score += 30; // More movement is okay
+            }
+        }
+
+        // Check mouse movement variance (bots have linear paths)
+        if (isset($behavior['mouse_variance'])) {
+            $variance = (float) $behavior['mouse_variance'];
+
+            if ($variance < 5) {
+                $flags[] = 'linear-mouse-path';
+            } elseif ($variance >= 5 && $variance < 100) {
+                $score += 30; // Natural variance
+            } else {
+                $score += 20; // High variance okay
+            }
+        }
+
+        // Check scroll behavior
+        if (isset($behavior['scroll_events'])) {
+            $scrolls = (int) $behavior['scroll_events'];
+
+            if ($scrolls > 0) {
+                $score += 10; // Humans often scroll
+            }
+        }
+
+        // Check keyboard events
+        if (isset($behavior['key_presses'])) {
+            $keys = (int) $behavior['key_presses'];
+
+            if ($keys > 0) {
+                $score += 10; // Typing is human
+            }
+        }
+
+        // Check timing (humans take time to fill forms)
+        if (isset($behavior['interaction_duration'])) {
+            $duration = (float) $behavior['interaction_duration'];
+
+            if ($duration < 2000) {
+                $flags[] = 'too-fast';
+            } elseif ($duration >= 2000 && $duration < 300000) {
+                $score += 10; // Reasonable time
+            }
+        }
+
+        // Bot detection: Instant form fills without interaction
+        if (
+            ($behavior['mouse_moves'] ?? 0) === 0 &&
+            ($behavior['key_presses'] ?? 0) === 0 &&
+            ($behavior['interaction_duration'] ?? 0) < 1000
+        ) {
+            $flags[] = 'instant-fill-no-interaction';
+            $score = 0; // Definitely bot
+        }
+
+        $threshold = apply_filters(
+            self::$namespace . '/captcha/behavior-score-threshold',
+            40 // Require at least 40% human score
+        );
+
+        return [
+            'score' => $score,
+            'max_score' => $max_score,
+            'percentage' => ($score / $max_score) * 100,
+            'passed' => $score >= $threshold,
+            'flags' => $flags,
+        ];
     }
 
     private static function getClientIp(): ?string
@@ -405,6 +553,7 @@ class PluginService extends Singleton
 
         return $validated;
     }
+
 
     public static function requestNonce(): void
     {
@@ -471,15 +620,21 @@ class PluginService extends Singleton
             );
         }
 
-        $client_ip = self::getClientIp();
-
         if ($client_ip) {
             $_SESSION['LEXO_CAPTCHA_TOKEN_IP'] = $client_ip;
+
+            // Generate HMAC signature for interaction timestamp validation
+            $interaction_signature = hash_hmac('sha256', $timestamp . $token, wp_salt('auth'));
+            $_SESSION['LEXO_CAPTCHA_INTERACTION_SIGNATURE'] = $interaction_signature;
         }
 
+        $lchp_field = self::generateLchpField();
+        $_SESSION['LEXO_CAPTCHA_LCHP_FIELD'] = $lchp_field;
+
         wp_send_json_success([
-            'token'      => $token,
-            'next_nonce' => wp_create_nonce(self::getRequestTokenNonceAction()),
+            'token'          => $token,
+            'next_nonce'     => wp_create_nonce(self::getRequestTokenNonceAction()),
+            'lchp_field' => $lchp_field,
         ]);
     }
 
@@ -596,6 +751,99 @@ class PluginService extends Singleton
 
         $data = $decoded;
 
+        if (!empty($_SESSION['LEXO_CAPTCHA_LCHP_FIELD'])) {
+            $lchp_field = $_SESSION['LEXO_CAPTCHA_LCHP_FIELD'];
+
+            if (!array_key_exists('lchp', $data)) {
+                self::appendStatistics(
+                    'lchp-missing',
+                    $timestamp,
+                    $data['interacted'] ?? null,
+                    $data['token'] ?? null,
+                    $_SESSION['LEXO_CAPTCHA_TOKEN'] ?? null,
+                    $_SESSION['LEXO_CAPTCHA_TOKEN_GENERATION_TIMESTAMP'] ?? null,
+                );
+
+                return false;
+            }
+
+            if (!empty($data['lchp'][$lchp_field])) {
+                self::appendStatistics(
+                    'lchp-filled',
+                    $timestamp,
+                    $data['interacted'] ?? null,
+                    $data['token'] ?? null,
+                    $_SESSION['LEXO_CAPTCHA_TOKEN'] ?? null,
+                    $_SESSION['LEXO_CAPTCHA_TOKEN_GENERATION_TIMESTAMP'] ?? null,
+                    [
+                        'lchp_value' => substr(
+                            sanitize_text_field($data['lchp'][$lchp_field]),
+                            0,
+                            50
+                        ),
+                    ]
+                );
+
+                return false;
+            }
+        }
+
+        // Validate browser fingerprint
+        if (!empty($data['fingerprint']) && is_array($data['fingerprint'])) {
+            $stored_fingerprint = $_SESSION['LEXO_CAPTCHA_FINGERPRINT'] ?? null;
+
+            if (!self::validateFingerprint($data['fingerprint'], $stored_fingerprint)) {
+                self::appendStatistics(
+                    'fingerprint-mismatch',
+                    $timestamp,
+                    $data['interacted'] ?? null,
+                    $data['token'] ?? null,
+                    $_SESSION['LEXO_CAPTCHA_TOKEN'] ?? null,
+                    $_SESSION['LEXO_CAPTCHA_TOKEN_GENERATION_TIMESTAMP'] ?? null,
+                    [
+                        'fingerprint_data' => $data['fingerprint'],
+                    ]
+                );
+
+                return false;
+            }
+
+            // Store fingerprint hash for token validation
+            if (!$stored_fingerprint) {
+                $fingerprint_string = implode('|', [
+                    $data['fingerprint']['screen'] ?? '',
+                    $data['fingerprint']['timezone'] ?? '',
+                    $data['fingerprint']['language'] ?? '',
+                    $data['fingerprint']['platform'] ?? '',
+                    $data['fingerprint']['hardware'] ?? '',
+                ]);
+                $_SESSION['LEXO_CAPTCHA_FINGERPRINT'] = hash('sha256', $fingerprint_string);
+            }
+        }
+
+        // Validate behavioral analysis
+        if (!empty($data['behavior']) && is_array($data['behavior'])) {
+            $behavior_result = self::validateBehavior($data['behavior']);
+
+            if (!$behavior_result['passed']) {
+                self::appendStatistics(
+                    'behavior-check-failed',
+                    $timestamp,
+                    $data['interacted'] ?? null,
+                    $data['token'] ?? null,
+                    $_SESSION['LEXO_CAPTCHA_TOKEN'] ?? null,
+                    $_SESSION['LEXO_CAPTCHA_TOKEN_GENERATION_TIMESTAMP'] ?? null,
+                    [
+                        'behavior_score' => $behavior_result['score'],
+                        'behavior_percentage' => $behavior_result['percentage'],
+                        'behavior_flags' => $behavior_result['flags'],
+                    ]
+                );
+
+                return false;
+            }
+        }
+
         if (!self::validReferer()) {
             self::appendStatistics(
                 'invalid-referer-host',
@@ -683,6 +931,7 @@ class PluginService extends Singleton
         $captcha_token_generation_timestamp = (float) $_SESSION['LEXO_CAPTCHA_TOKEN_GENERATION_TIMESTAMP'];
         $captcha_token_user_agent = $_SESSION['LEXO_CAPTCHA_TOKEN_USER_AGENT'] ?? null;
         $captcha_token_ip = $_SESSION['LEXO_CAPTCHA_TOKEN_IP'] ?? null;
+        $expected_signature = $_SESSION['LEXO_CAPTCHA_INTERACTION_SIGNATURE'] ?? null;
 
         self::clearTokenSession();
 
@@ -697,6 +946,28 @@ class PluginService extends Singleton
             );
 
             return false;
+        }
+
+        // Verify HMAC signature to prevent timestamp tampering
+        if ($expected_signature) {
+            $computed_signature = hash_hmac('sha256', $captcha_token_generation_timestamp . $captcha_token, wp_salt('auth'));
+
+            if (!hash_equals($expected_signature, $computed_signature)) {
+                self::appendStatistics(
+                    'signature-mismatch',
+                    $timestamp,
+                    $interaction,
+                    $data['token'],
+                    $captcha_token,
+                    $captcha_token_generation_timestamp,
+                    [
+                        'expected_signature' => $expected_signature,
+                        'computed_signature' => $computed_signature,
+                    ]
+                );
+
+                return false;
+            }
         }
 
         $current_user_agent = !empty($_SERVER['HTTP_USER_AGENT'])
@@ -844,6 +1115,16 @@ class PluginService extends Singleton
                 return __('Token does not match the requesting browser.', 'lexocaptcha');
             case 'token-ip-mismatch':
                 return __('Token does not match the requesting IP address.', 'lexocaptcha');
+            case 'signature-mismatch':
+                return __('Token signature validation failed. Possible tampering detected.', 'lexocaptcha');
+            case 'lchp-missing':
+                return __('LCHP field missing. Bot detected.', 'lexocaptcha');
+            case 'lchp-filled':
+                return __('LCHP field was filled. Bot detected.', 'lexocaptcha');
+            case 'fingerprint-mismatch':
+                return __('Browser fingerprint mismatch. Possible session hijacking.', 'lexocaptcha');
+            case 'behavior-check-failed':
+                return __('Behavioral analysis failed. Bot-like activity detected.', 'lexocaptcha');
             case 'interaction-data-missing':
                 return __('Interaction data missing.', 'lexocaptcha');
             case 'interaction-data-invalid':
