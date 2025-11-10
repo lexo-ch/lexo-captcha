@@ -1,3 +1,10 @@
+## [2.1.3](https://github.com/lexo-ch/lexo-captcha/compare/v2.1.2...v2.1.3) (2025-11-10)
+
+
+### Bug Fixes
+
+* **core:** Fix undefined $client_ip variable ([e246203](https://github.com/lexo-ch/lexo-captcha/commit/e2462031cbfd3e9ef0df18fe45c6836ed02d4224))
+
 ## [2.1.2](https://github.com/lexo-ch/lexo-captcha/compare/v2.1.1...v2.1.2) (2025-11-09)
 
 
