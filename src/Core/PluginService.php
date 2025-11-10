@@ -620,6 +620,8 @@ class PluginService extends Singleton
             );
         }
 
+        $client_ip = self::getClientIp();
+
         if ($client_ip) {
             $_SESSION['LEXO_CAPTCHA_TOKEN_IP'] = $client_ip;
 
